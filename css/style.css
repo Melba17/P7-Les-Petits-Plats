@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.background {
+  object-fit: cover;
+  width: 100%;
+  position: relative;
+  z-index: -1;
+}
+
+.logo {
+  position: absolute;
+  left: 40px;
+  top: 40px;
+}
+
+h1 {
+  color: #FFD15B;
+  font-family: "Anton", sans-serif;
+  font-size: 44px;
+}
+
+.tagline {
+  position: absolute;
+  width: 700px;
+  margin-left: 27%;
+  margin-top: 18%;
+  text-align: center;
+}
