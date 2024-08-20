@@ -1,4 +1,5 @@
-const recipes = [
+// formaté "export" pour être chargé en tant que module JavaScript
+export const recipes = [
     {
         "id": 1,
         "image": "Recette01.jpg",
