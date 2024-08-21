@@ -6,7 +6,7 @@
 }
 
 body {
-  background: #C6C6C6;
+  background: #c6c6c6;
 }
 
 /****************** ENTÊTE ***/
@@ -14,10 +14,10 @@ body {
 .background {
   object-fit: cover;
   width: 100%;
-  position: absolute; 
+  position: absolute;
   top: 0;
   left: 0;
-  z-index: -1; 
+  z-index: -1;
 }
 
 /* Logo */
@@ -29,12 +29,12 @@ body {
 
 /* Titre */
 h1 {
-  color: #FFD15B;
+  color: #ffd15b;
   font-family: "Anton", sans-serif;
   font-size: 42px;
   letter-spacing: 1px;
   font-weight: 400;
-  width: 690px; 
+  width: 690px;
   text-align: center;
   margin-left: 24.5%;
   margin-top: 17.5%;
@@ -53,7 +53,7 @@ h1 {
   width: 100%;
   padding: 20px;
   padding-left: 30px;
-  padding-right: 60px; 
+  padding-right: 60px;
   border-radius: 8px;
   outline: none;
   border-style: none;
@@ -64,14 +64,14 @@ h1 {
 /* Conteneur de l'icône de recherche */
 .glass {
   position: absolute;
-  right: 6px; 
-  top: 50%; 
+  right: 6px;
+  top: 50%;
   transform: translateY(-50%); /* Ajuste le centrage vertical */
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 45px; 
-  height: 45px; 
+  width: 45px;
+  height: 45px;
 }
 
 /* Icône de recherche */
@@ -81,14 +81,14 @@ h1 {
   background-color: black;
   width: 40px;
   height: 40px;
-  border-radius: 8px; 
+  border-radius: 8px;
   padding: 8px;
   cursor: pointer;
 }
 
 /* Effet au survol de l'icône de recherche */
 .glass i:hover {
-  background-color: #FFD15B;
+  background-color: #ffd15b;
   color: black;
 }
 
@@ -106,29 +106,93 @@ h1 {
   flex-direction: row;
   align-items: center;
   gap: 70px;
-  margin-top: 220px; 
+  margin-top: 220px;
   margin-left: 90px;
   margin-bottom: 50px;
 }
 
 /* Style pour le bouton du dropdown */
 .dropdown {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: white;
   color: black;
   border-style: none;
-  padding: 15px 20px;
+  padding: 15px 18px;
   border-radius: 8px;
   font-size: 16px;
   width: 190px;
 }
 
+.dropdown-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.dropdown.show .dropdown-content {
+  display: block; /* Affiche le menu déroulant quand la classe 'show' est ajoutée */
+}
+
+.dropdown-content {
+  display: none; /* Caché par défaut */
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  font-family: "Manrope", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 2.5em;
+  color: black;
+  border-style: none;
+  padding: 15px 18px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  width: 190px;
+  margin-top: -15px;
+  cursor: pointer;
+  max-height: 310px; 
+  overflow-y: auto;  /* Active le défilement vertical si le contenu dépasse */
+  scrollbar-width: none; /* Pour cacher la barre de défilement / Fonctionne très bien dans Chrome, Firefox et Microsoft Edge malgré le message de VsCode*/
+}
+
+.search-filters {
+  width: 155px;
+  padding: 5px;
+  padding-left: 5px;
+  padding-right: 25px;
+  border-radius: 2px;
+  outline: none;
+  border-style: solid;
+  color: #c6c6c6;
+  border-color: #c6c6c6;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.filters-icon {
+  display: flex;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  color: #c6c6c6;
+  top: 38%;
+  transform: translateY(-50%); /* Ajuste le centrage vertical */
+  right: 10px;
+}
+
 .counter {
   font-family: "Anton", sans-serif;
   color: black;
-  margin-top: 220px; 
+  margin-top: 220px;
   margin-right: 90px;
   margin-bottom: 50px;
   font-size: 21px;
@@ -154,7 +218,7 @@ h1 {
 
 .card-top {
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
 }
 
 .card-img-top {
@@ -171,9 +235,9 @@ h1 {
   display: flex;
   justify-content: center;
   font-size: 12px;
-  background-color: #FFD15B;
+  background-color: #ffd15b;
   width: 60px;
-  padding: 4px; 
+  padding: 4px;
   border-radius: 20px;
   margin: 1.5% 1.5%;
 }
@@ -193,7 +257,7 @@ h1 {
   font-family: "Manrope", sans-serif;
   font-weight: 700;
   font-size: 12px;
-  color: #7A7A7A;
+  color: #7a7a7a;
   margin-bottom: 15px;
 }
 
@@ -201,6 +265,10 @@ h1 {
   font-weight: 400;
   font-size: 14px;
   margin-bottom: 30px;
+  display: block;
+  overflow: hidden;
+  max-height: calc(4 * 1.4em); /* Nombre de lignes par hauteur de ligne */
+  line-height: 1.4em;
 }
 
 .small-grid {
@@ -217,5 +285,5 @@ h1 {
 .card span {
   font-weight: 400;
   font-size: 14px;
-  color: #7A7A7A;
+  color: #7a7a7a;
 }

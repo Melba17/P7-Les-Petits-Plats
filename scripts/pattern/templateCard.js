@@ -6,7 +6,7 @@ export class TemplateCards {
     this.time = data.time;
     this.name = data.name;
     this.description = data.description;
-    this.ingredientsList = this.ingredients;
+    this.ingredientsList = data.ingredients;
     }
     
     // Méthode pour afficher la carte de recette
@@ -28,7 +28,7 @@ export class TemplateCards {
 
         const topElementTime = document.createElement('div');
         topElementTime.classList.add('card-time');
-        topElementTime.textContent = `${this.time} min`;
+        topElementTime.textContent = `${this.time}min`;
 
         topCard.appendChild(topElementImg);
         topCard.appendChild(topElementTime);
@@ -56,11 +56,12 @@ export class TemplateCards {
         bodyCard.appendChild(descriptionCard);
         bodyCard.appendChild(subtitleTwoCard);
 
+
+        const smallGridCard = document.createElement('div');
+        smallGridCard.classList.add('small-grid');
+
         // Ajout des ingrédients à la carte
         this.ingredientsList.forEach((item) => {
-
-            const smallGridCard = document.createElement('div');
-            smallGridCard.classList.add('small-grid');
 
             const detailsCard = document.createElement('div');
 
@@ -68,7 +69,7 @@ export class TemplateCards {
             title.textContent = item.ingredient;
 
             const span = document.createElement('span');
-            span.textContent = `${item.quantity || ''} ${item.unit || ''}`.trim();
+            span.textContent = `${item.quantity || '-'}${item.unit || ''}`.trim();
 
             detailsCard.appendChild(title);
             detailsCard.appendChild(span);

@@ -1,6 +1,7 @@
 // Importation des modules
 import { recipes } from './api/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
+import { createFiltersButtons } from './utils/dropdowns.js';
 
 // Fonction pour récupérer les données des recettes
 async function getData() {
@@ -27,6 +28,8 @@ async function showRecipeCard() {
         cardSection.appendChild(card.display());  
     });
 }
-
 // Appelle la fonction pour afficher les cartes
 showRecipeCard();  
+
+// Appelle la fonction pour afficher les boutons de filtres
+createFiltersButtons(await getData());
