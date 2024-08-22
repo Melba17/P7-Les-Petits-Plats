@@ -47,9 +47,9 @@ export function createFiltersButtons(recipes) {
 
 }
 
-
+// Gestion de l'affichage/masquage du menu déroulant au clic
 function filtersButtonsDOM(ingredientsButton, ingredientsContent, iconIngredients, recipes) {
-    // Gestion de l'affichage/masquage du menu déroulant au clic
+    
     ingredientsButton.addEventListener('click', () => {
         const isExpanded = ingredientsButton.getAttribute("aria-expanded") === "true";
         ingredientsButton.setAttribute("aria-expanded", !isExpanded);
@@ -64,42 +64,95 @@ function filtersButtonsDOM(ingredientsButton, ingredientsContent, iconIngredient
     });
 }
 
-// Fonction pour créer la barre de recherche et la liste des ingrédients à l'intérieur du menu déroulant
+// Fonction pour l'intérieur du menu déroulant
 function createIngredientsSearch(ingredientsContent, recipes) {
     // Si la barre de recherche n'est pas déjà créée
     if (!ingredientsContent.querySelector('.search-filters')) {
         // Conteneur pour le champ de recherche et l'icône
         const searchContainer = document.createElement('div');
-        searchContainer.style.position = 'relative'; // Pour positionner l'icône de recherche à l'intérieur du menu déroulant
+        searchContainer.style.position = 'sticky';
+        searchContainer.style.top = '0';
+        searchContainer.style.backgroundColor = 'white';
+        searchContainer.style.zIndex = '1'; // Pour s'assurer qu'elle reste au-dessus de la liste des ingrédients
+        searchContainer.style.padding = '10px 0 0 0'; // Ajout d'un padding pour un meilleur espacement
 
+        // Barre de recherche
         const ingredientsSearch = document.createElement('input');
         ingredientsSearch.classList.add('search-filters');
         ingredientsSearch.setAttribute('type', 'search');
         ingredientsSearch.setAttribute('id', 'ingredients');
         ingredientsSearch.setAttribute('name', 'ingredients');
-        ingredientsSearch.setAttribute('aria-label', 'Rechercher parmi les ingrédients');
+        ingredientsSearch.setAttribute('aria-label', 'rechercher parmi les ingrédients');
 
+        // Icône loupe de recherche
         const iconSearch = document.createElement('i');
         iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
         iconSearch.setAttribute('aria-hidden', 'true');
 
-        // Ajouter l'icône et le champ de recherche au conteneur
+        // Icône croix pour vider le champ de recherche
+        const clearIcon = document.createElement('i');
+        clearIcon.className = 'fa-solid fa-xmark clear-icon'; 
+        clearIcon.setAttribute('aria-label', 'croix pour supprimer la saisie');
+        clearIcon.style.position = 'absolute';
+        clearIcon.style.display = 'none'; // Masqué par défaut
+
+        // Ajoute les icônes et le champ de recherche au conteneur
         searchContainer.appendChild(iconSearch);
         searchContainer.appendChild(ingredientsSearch);
+        searchContainer.appendChild(clearIcon);
         ingredientsContent.appendChild(searchContainer);
 
+        
         // Variable qui récupère la liste des ingrédients unique à partir des recettes
         // "map" transforme chaque objet ingredient en une simple chaîne de caractères 
         // "flatMap" aplatit le résultat pour que tous les ingrédients soient dans un seul tableau, sans sous-tableaux imbriqués
         // "new Set" est utilisé pour éliminer les doublons et obtenir une liste unique
         const ingredientsList = [...new Set(recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)))];
 
-        // Ajouter chaque ingrédient dans le menu déroulant
-        ingredientsList.forEach(ingredient => {
-            const ingredientItem = document.createElement('div');
-            ingredientItem.className = 'ingredient-item';
-            ingredientItem.textContent = ingredient;
-            ingredientsContent.appendChild(ingredientItem);
+        // Conteneur pour la liste des ingrédients
+        const ingredientsListContainer = document.createElement('div');
+        ingredientsContent.appendChild(ingredientsListContainer);
+
+        // Fonction pour afficher la liste des ingrédients filtrés
+        function displayIngredientsList(filteredIngredients) {
+            ingredientsListContainer.innerHTML = ''; // On vide la liste avant de la remplir
+            filteredIngredients.forEach(ingredient => {
+                const ingredientItem = document.createElement('div');
+                ingredientItem.className = 'ingredient-item';
+                ingredientItem.textContent = ingredient;
+                
+                ingredientsListContainer.appendChild(ingredientItem);
+            });
+        }
+
+        // Affichage initial de la liste des ingrédients
+        displayIngredientsList(ingredientsList);
+
+        // Mise à jour de la liste des ingrédients en fonction de la recherche
+        ingredientsSearch.addEventListener('input', () => {
+            const query = ingredientsSearch.value.toLowerCase().trim();
+            clearIcon.style.display = query ? 'block' : 'none'; // Affiche ou masque la croix
+
+            // Filtre la liste des ingrédients en fonction de la requête de recherche (query). Pour chaque ingrédient de la liste "ingredientsList", la méthode `filter` vérifie si le nom de l'ingrédient, converti en minuscules avec `toLowerCase()`, contient la chaîne de caractères de la recherche (query), également convertie en minuscules. Seuls les ingrédients qui contiennent la requête seront inclus dans le tableau "filteredIngredients".
+            const filteredIngredients = ingredientsList.filter(ingredient =>
+                ingredient.toLowerCase().includes(query)
+            );
+
+            displayIngredientsList(filteredIngredients);
+        });
+
+        // Action pour vider le champ de recherche lorsqu'on clique sur la croix
+        clearIcon.addEventListener('click', () => {
+            ingredientsSearch.value = '';
+            clearIcon.style.display = 'none'; 
+            displayIngredientsList(ingredientsList); // Réinitialise la liste complète
         });
     }
 }
+
+
+
+
+        
+
+        
