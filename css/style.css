@@ -92,6 +92,22 @@ h1 {
   color: black;
 }
 
+/* Croix */
+.cross-icon {
+  position: absolute;
+  right: 55px; 
+  cursor: pointer;
+  color: #c6c6c6;
+  width: 20px;
+  height: 20px;
+  top: 55%;
+  transform: translateY(-50%);
+}
+
+.cross-icon:hover {
+  color: black;
+}
+
 /********** BOUTONS DE FILTRES **********/
 .flex {
   display: flex;
@@ -142,8 +158,6 @@ h1 {
   display: none; /* Caché par défaut */
   position: absolute;
   z-index: 2;
-  display: flex;
-  align-items: center;
   background-color: white;
   font-family: "Manrope", sans-serif;
   font-weight: 400;
@@ -157,8 +171,8 @@ h1 {
   border-bottom-right-radius: 8px;
   width: 190px;
   margin-top: -7px;
+  max-height: 265px; 
   cursor: pointer;
-  max-height: 280px; 
   overflow-y: auto;  /* Active le défilement vertical si le contenu dépasse */
   scrollbar-width: none; /* Pour cacher la barre de défilement / Fonctionne très bien dans Chrome, Firefox et Microsoft Edge malgré le message de VsCode*/
   padding-top: 0;
@@ -221,7 +235,8 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 .ingredient-item:hover {
   background-color: #ffd15b;
-  width: 100%;  
+  width: 100%;
+  font-weight: 600;  
 }
 
 .counter {
@@ -233,13 +248,47 @@ input[type="search"]::-webkit-search-cancel-button {
   font-size: 21px;
 }
 
+
+/*** Pour les options sélectionnées par l'utilisateur au-dessous des boutons de filtres ****/
+.selected-item {
+  display: none; /* Caché par défaut */
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: black;
+  background-color: #ffd15b;
+  padding: 15px 18px;
+  border-radius: 8px;
+  width: 190px; 
+  position: relative;
+  margin-left: 90px;
+}
+
+.cross-item {
+  position: absolute;
+  right: 10px; 
+  cursor: pointer;
+  color: black;
+  width: 20px;
+  height: 20px;
+  top: 57%;
+  transform: translateY(-50%);
+}
+
+
+/*** Conteneur pour les options sélectionnées ***/
+.options-container {
+  margin-top: -25px; /* Ajuste cette valeur selon la disposition désirée */
+}
+
 /***** CARTES RECETTES *****/
-/*** Conteneur principal ***/
+/*** Ajuste la marge pour tenir compte de l'option sélectionnée ***/
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 60px 42px;
   margin: 0 90px 180px 90px;
+  transition: margin-top 0.3s ease; /* Pour un ajustement fluide */
 }
 
 /** Composition carte ***/
