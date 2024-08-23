@@ -251,7 +251,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 /*** Pour les options sélectionnées par l'utilisateur au-dessous des boutons de filtres ****/
 .selected-item {
-  display: none; /* Caché par défaut */
+  display: block; /* Caché par défaut */
   font-family: "Manrope", sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -278,7 +278,11 @@ input[type="search"]::-webkit-search-cancel-button {
 
 /*** Conteneur pour les options sélectionnées ***/
 .options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   margin-top: -25px; /* Ajuste cette valeur selon la disposition désirée */
+  
 }
 
 /***** CARTES RECETTES *****/
