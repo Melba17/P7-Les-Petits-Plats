@@ -144,7 +144,7 @@ export const recipes = [
             }
         ],
         "time": 50,
-        "description": "Faire cuire le riz. Une fois le riz cuit, le laisser refroidir. Couper les oeufs dur en quarts ou en lamelle au choix, coupez le tomates en dés, ajouter au riz les oeufs, les tomates, le poisson, le maïs et la vinaigrette. Ajouter au gout de chacun des corniches, olives etc..",
+        "description": "Faire cuire le riz. Une fois le riz cuit, le laisser refroidir. Couper les oeufs dur en quarts ou en lamelle au choix, coupez le tomates en dés, ajouter au riz les oeufs, les tomates, le poisson, le maïs et la vinaigrette. Ajouter au gout de chacun des cornichons, olives etc..",
         "appliance": "Cuiseur de riz",
         "ustensils": ["saladier", "passoire"]
     },
@@ -219,7 +219,7 @@ export const recipes = [
             {
                 "ingredient": "Sucre vanillé",
                 "quantity": 1,
-                "unit": "sachets"
+                "unit": "sachet"
 
             }
         ],
@@ -393,7 +393,7 @@ export const recipes = [
                 "unit": "tranches"
             }, 
             {
-                "ingredient": "Pommes",
+                "ingredient": "Pomme",
                 "quantity": 1
             },
             {
@@ -458,7 +458,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Échalote",
+                "ingredient": "Échalotes",
                 "quantity": 2
 
             },
@@ -468,9 +468,9 @@ export const recipes = [
                 "unit":"cuillère à soupe"
             },
             {
-                "ingredient": "huile d'olive",
+                "ingredient": "Huile d'olive",
                 "quantity": 2,
-                "unit": "cuillère à soupe"
+                "unit": "cuillères à soupe"
             }
         ],
         "time":40,
@@ -526,7 +526,7 @@ export const recipes = [
         "servings": 10,
         "ingredients": [
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 3
             },
             {
@@ -586,7 +586,7 @@ export const recipes = [
                 "unit":"tiges"
             },
             {
-                "ingredient": "huile d'olives",
+                "ingredient": "Huile d'olive",
                 "quantity": 2,
                 "unit": "cuillère à soupe"
             }
@@ -716,7 +716,7 @@ export const recipes = [
                 "unit":"grammes"
             },
             {
-                "ingredient": "huile d'olive",
+                "ingredient": "Huile d'olive",
                 "quantity": 1,
                 "unit": "cuillères à soupe"
             }
@@ -738,7 +738,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Oignon",
+                "ingredient": "Oignons",
                 "quantity": 2
             },
             {
@@ -759,7 +759,7 @@ export const recipes = [
             {
                 "ingredient": "Crème fraîche",
                 "quantity" : 1,
-                "unit": "cuillères à soupe"
+                "unit": "cuillère à soupe"
             }
         ],
         "time": 30,
@@ -789,7 +789,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 4
             },
             {
@@ -825,7 +825,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 3
             },
             {
@@ -935,7 +935,7 @@ export const recipes = [
                 "quantity": 1
             },
             {
-                "ingredient": "Huile d'olives"
+                "ingredient": "Huile d'olive"
             },
             {
                 "ingredient": "Oignon",
@@ -969,7 +969,7 @@ export const recipes = [
             {
                 "ingredient": "Crème fraîche",
                 "quantity": 4,
-                "unit": "cuillère à soupe"
+                "unit": "cuillères à soupe"
             },
             {
                 "ingredient": "Vermicelles",
@@ -1037,7 +1037,7 @@ export const recipes = [
             {
                 "ingredient": "Ail",
                 "quantity": 1,
-                "unit": "gousses"
+                "unit": "gousse"
             },
             {
                 "ingredient": "Citron",
@@ -1101,7 +1101,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Petits poids",
+                "ingredient": "Petits pois",
                 "quantity": 100,
                 "unit":"grammes"
             },
@@ -1186,7 +1186,7 @@ export const recipes = [
             {
                 "ingredient": "Jus de citron",
                 "quantity": 1,
-                "unit": "cuillères à soupe"
+                "unit": "cuillère à soupe"
             }
         ],
         "time": 5,
@@ -1319,7 +1319,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Huile d'olives",
+                "ingredient": "Huile d'olive",
                 "quantity": 25,
                 "unit": "cl"
             },
@@ -1361,7 +1361,7 @@ export const recipes = [
                 "unit": "cl"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 3
             },
             {
@@ -1415,7 +1415,7 @@ export const recipes = [
             {
                 "ingredient": "Eau",
                 "quantity": 1,
-                "unit": "Litres"
+                "unit": "Litre"
             },
             {
                 "ingredient": "Citron Vert",
@@ -1429,7 +1429,7 @@ export const recipes = [
             {
                 "ingredient": "Bicarbonate",
                 "quantity": 1,
-                "unit": "cuillères à café"
+                "unit": "cuillère à café"
             }
         ],
         "time": 10,
@@ -1444,7 +1444,7 @@ export const recipes = [
         "servings": 4,
         "ingredients": [
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 3
             },
             {
@@ -1455,7 +1455,7 @@ export const recipes = [
             {
                 "ingredient": "Sucre vanillé",
                 "quantity": 1,
-                "unit": "sachets"
+                "unit": "sachet"
             }
         ],
         "time": 20,
@@ -1475,7 +1475,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 3
             },
             {
@@ -1515,7 +1515,7 @@ export const recipes = [
                 "unit": "grammes"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 3
             },
             {
@@ -1536,7 +1536,7 @@ export const recipes = [
             {
                 "ingredient": "Lait",
                 "quantity": 1,
-                "unit": "litres"
+                "unit": "litre"
             },
             {
                 "ingredient": "Chocolat",
@@ -1576,7 +1576,7 @@ export const recipes = [
                 "unit": "cl"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 2
             },
             {
@@ -1614,10 +1614,10 @@ export const recipes = [
             {
                 "ingredient": "Sucre vanillé",
                 "quantity": 1,
-                "unit": "sachets"
+                "unit": "sachet"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 4
             },
             {
@@ -1750,11 +1750,11 @@ export const recipes = [
                 "unit":"grammes"
             },
             {
-                "ingredient": "Oeuf",
+                "ingredient": "Oeufs",
                 "quantity": 6
             },
             {
-                "ingredient": "Poudre d'amendes",
+                "ingredient": "Poudre d'amandes",
                 "quantity": 500,
                 "unit": "grammes"
             },

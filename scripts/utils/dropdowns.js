@@ -1,11 +1,12 @@
 // Fonction pour créer les boutons de filtre
-export function createFiltersButtons(recipes, selectIngredientCallback) {
+export function createFiltersButtons(recipes, selectIngredientCallback, selectApplianceCallback, selectUstensilCallback) {
     const filtersButtonsDiv = document.querySelector('.dropdowns');
     if (!filtersButtonsDiv) {
         console.error("La div .dropdowns n'existe pas dans le DOM.");
         return;
     }
 
+    // Créer le bouton pour les ingrédients
     let dropdownIngredients = document.querySelector('#dropdownIngredients');
     if (!dropdownIngredients) {
         dropdownIngredients = document.createElement('div');
@@ -38,32 +39,116 @@ export function createFiltersButtons(recipes, selectIngredientCallback) {
         dropdownIngredients.appendChild(ingredientsContent);
         filtersButtonsDiv.appendChild(dropdownIngredients);
 
-        filtersButtonsDOM(ingredientsButton, ingredientsContent, iconIngredients, recipes, selectIngredientCallback);
+        filtersButtonsDOM(ingredientsButton, ingredientsContent, iconIngredients, recipes, selectIngredientCallback, createIngredientsSearch);
+    }
+
+    // Créer le bouton pour les appareils
+    let dropdownAppliances = document.querySelector('#dropdownAppliances');
+    if (!dropdownAppliances) {
+        dropdownAppliances = document.createElement('div');
+        dropdownAppliances.className = 'dropdown-wrapper';
+        dropdownAppliances.id = 'dropdownAppliances';
+
+        const appliancesButton = document.createElement('button');
+        appliancesButton.className = 'dropdown';
+        appliancesButton.type = 'button';
+        appliancesButton.id = 'dropdownAppliancesButton';
+        appliancesButton.setAttribute('aria-haspopup', 'listbox');
+        appliancesButton.setAttribute('aria-expanded', 'false');
+        appliancesButton.setAttribute('aria-label', 'filtre appareils');
+
+        const appliancesTextSpan = document.createElement('span');
+        appliancesTextSpan.textContent = 'Appareils';
+        appliancesButton.appendChild(appliancesTextSpan);
+
+        const iconAppliances = document.createElement('i');
+        iconAppliances.className = 'fa-solid fa-angle-down dropdown-icon';
+        appliancesButton.appendChild(iconAppliances);
+
+        dropdownAppliances.appendChild(appliancesButton);
+
+        const appliancesContent = document.createElement('div');
+        appliancesContent.className = 'dropdown-content';
+        appliancesContent.setAttribute('role', 'listbox');
+        appliancesContent.setAttribute('aria-labelledby', 'dropdownAppliancesButton');
+
+        dropdownAppliances.appendChild(appliancesContent);
+        filtersButtonsDiv.appendChild(dropdownAppliances);
+
+        filtersButtonsDOM(appliancesButton, appliancesContent, iconAppliances, recipes, selectApplianceCallback, createAppliancesSearch);
+    }
+
+    // Créer le bouton pour les ustensiles
+    let dropdownUstensils = document.querySelector('#dropdownUstensils');
+    if (!dropdownUstensils) {
+        dropdownUstensils = document.createElement('div');
+        dropdownUstensils.className = 'dropdown-wrapper';
+        dropdownUstensils.id = 'dropdownUstensils';
+
+        const ustensilsButton = document.createElement('button');
+        ustensilsButton.className = 'dropdown';
+        ustensilsButton.type = 'button';
+        ustensilsButton.id = 'dropdownUstensilsButton';
+        ustensilsButton.setAttribute('aria-haspopup', 'listbox');
+        ustensilsButton.setAttribute('aria-expanded', 'false');
+        ustensilsButton.setAttribute('aria-label', 'filtre ustensiles');
+
+        const ustensilsTextSpan = document.createElement('span');
+        ustensilsTextSpan.textContent = 'Ustensiles';
+        ustensilsButton.appendChild(ustensilsTextSpan);
+
+        const iconUstensils = document.createElement('i');
+        iconUstensils.className = 'fa-solid fa-angle-down dropdown-icon';
+        ustensilsButton.appendChild(iconUstensils);
+
+        dropdownUstensils.appendChild(ustensilsButton);
+
+        const ustensilsContent = document.createElement('div');
+        ustensilsContent.className = 'dropdown-content';
+        ustensilsContent.setAttribute('role', 'listbox');
+        ustensilsContent.setAttribute('aria-labelledby', 'dropdownUstensilsButton');
+
+        dropdownUstensils.appendChild(ustensilsContent);
+        filtersButtonsDiv.appendChild(dropdownUstensils);
+
+        filtersButtonsDOM(ustensilsButton, ustensilsContent, iconUstensils, recipes, selectUstensilCallback, createUstensilsSearch);
     }
 }
 
 // Fonction pour gérer les événements sur les boutons de filtre
-function filtersButtonsDOM(ingredientsButton, ingredientsContent, iconIngredients, recipes, selectIngredientCallback) {
-    ingredientsButton.addEventListener('click', () => {
-        const isExpanded = ingredientsButton.getAttribute("aria-expanded") === "true";
-        ingredientsButton.setAttribute("aria-expanded", !isExpanded);
-        ingredientsButton.classList.toggle('show');
+function filtersButtonsDOM(button, content, icon, recipes, selectCallback, createSearchFunction) {
+    button.addEventListener('click', () => {
+        const isExpanded = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", !isExpanded);
+        button.classList.toggle('show');
 
-        if (iconIngredients) {
-            iconIngredients.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+        if (icon) {
+            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
         }
 
-        ingredientsContent.style.display = isExpanded ? 'none' : 'block';
+        content.style.display = isExpanded ? 'none' : 'block';
 
         if (!isExpanded) {
-            createIngredientsSearch(ingredientsContent, recipes, selectIngredientCallback);
+            createSearchFunction(content, recipes, selectCallback);
+        }
+    });
+
+    // Fonction pour réinitialiser l'état du bouton et l'icône lorsque l'on sélectionne un item
+    content.addEventListener('click', (event) => {
+        if (event.target.classList.contains('item')) {
+            button.setAttribute("aria-expanded", "false");
+            button.classList.remove('show');
+            if (icon) {
+                icon.style.transform = 'rotate(0deg)';
+            }
+            content.style.display = 'none';
         }
     });
 }
 
 // Fonction pour créer la zone de recherche des ingrédients
-function createIngredientsSearch(ingredientsContent, recipes, selectIngredientCallback) {
-    if (!ingredientsContent.querySelector('.search-filters')) {
+function createIngredientsSearch(content, recipes, selectCallback) {
+    if (!content.querySelector('.search-filters')) {
         const searchContainer = document.createElement('div');
         searchContainer.style.position = 'sticky';
         searchContainer.style.top = '0';
@@ -71,12 +156,12 @@ function createIngredientsSearch(ingredientsContent, recipes, selectIngredientCa
         searchContainer.style.zIndex = '1';
         searchContainer.style.padding = '10px 0 0 0';
 
-        const ingredientsSearch = document.createElement('input');
-        ingredientsSearch.classList.add('search-filters');
-        ingredientsSearch.setAttribute('type', 'search');
-        ingredientsSearch.setAttribute('id', 'ingredients');
-        ingredientsSearch.setAttribute('name', 'ingredients');
-        ingredientsSearch.setAttribute('aria-label', 'rechercher parmi les ingrédients');
+        const searchInput = document.createElement('input');
+        searchInput.classList.add('search-filters');
+        searchInput.setAttribute('type', 'search');
+        searchInput.setAttribute('id', 'ingredients');
+        searchInput.setAttribute('name', 'ingredients');
+        searchInput.setAttribute('aria-label', 'rechercher parmi les ingrédients');
 
         const iconSearch = document.createElement('i');
         iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
@@ -88,49 +173,191 @@ function createIngredientsSearch(ingredientsContent, recipes, selectIngredientCa
         clearIcon.style.display = 'none';
 
         searchContainer.appendChild(iconSearch);
-        searchContainer.appendChild(ingredientsSearch);
+        searchContainer.appendChild(searchInput);
         searchContainer.appendChild(clearIcon);
-        ingredientsContent.appendChild(searchContainer);
+        content.appendChild(searchContainer);
 
         // Nettoyage des doublons en normalisant les ingrédients en minuscules
         const ingredientsList = [...new Set(
-            recipes.flatMap(recipe => 
-                recipe.ingredients.map(ing => ing.ingredient.toLowerCase())
-            )
+            recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient.toLowerCase()))
         )];
 
-        const ingredientsListContainer = document.createElement('div');
-        ingredientsListContainer.className = 'ingredients-list-container';
-        ingredientsContent.appendChild(ingredientsListContainer);
+        const listContainer = document.createElement('div');
+        listContainer.className = 'ingredients-list-container';
+        content.appendChild(listContainer);
 
-        function displayIngredientsList(filteredIngredients) {
-            ingredientsListContainer.innerHTML = '';
-            filteredIngredients.forEach(ingredient => {
-                const ingredientItem = document.createElement('div');
-                ingredientItem.className = 'ingredient-item';
-                ingredientItem.textContent = ingredient;
-                ingredientItem.addEventListener('click', () => {
-                    selectIngredientCallback(ingredient);
+        function displayList(filteredItems) {
+            listContainer.innerHTML = '';
+            filteredItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item';
+                itemElement.textContent = item;
+                itemElement.addEventListener('click', () => {
+                    selectCallback(item);
                 });
-                ingredientsListContainer.appendChild(ingredientItem);
+                listContainer.appendChild(itemElement);
             });
         }
 
-        displayIngredientsList(ingredientsList);
+        displayList(ingredientsList);
 
-        ingredientsSearch.addEventListener('input', () => {
-            const query = ingredientsSearch.value.toLowerCase().trim();
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
             clearIcon.style.display = query ? 'block' : 'none';
-            const filteredIngredients = ingredientsList.filter(ingredient =>
-                ingredient.toLowerCase().includes(query)
+            const filteredItems = ingredientsList.filter(item =>
+                item.toLowerCase().includes(query)
             );
-            displayIngredientsList(filteredIngredients);
+            displayList(filteredItems);
         });
 
         clearIcon.addEventListener('click', () => {
-            ingredientsSearch.value = '';
+            searchInput.value = '';
             clearIcon.style.display = 'none';
-            displayIngredientsList(ingredientsList);
+            displayList(ingredientsList);
+        });
+    }
+}
+
+// Fonction pour créer la zone de recherche des appareils
+function createAppliancesSearch(content, recipes, selectCallback) {
+    if (!content.querySelector('.search-filters')) {
+        const searchContainer = document.createElement('div');
+        searchContainer.style.position = 'sticky';
+        searchContainer.style.top = '0';
+        searchContainer.style.backgroundColor = 'white';
+        searchContainer.style.zIndex = '1';
+        searchContainer.style.padding = '10px 0 0 0';
+
+        const searchInput = document.createElement('input');
+        searchInput.classList.add('search-filters');
+        searchInput.setAttribute('type', 'search');
+        searchInput.setAttribute('id', 'appliances');
+        searchInput.setAttribute('name', 'appliances');
+        searchInput.setAttribute('aria-label', 'rechercher parmi les appareils');
+
+        const iconSearch = document.createElement('i');
+        iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
+        iconSearch.setAttribute('aria-hidden', 'true');
+
+        const clearIcon = document.createElement('i');
+        clearIcon.className = 'fa-solid fa-xmark clear-icon';
+        clearIcon.setAttribute('aria-label', 'croix pour supprimer la saisie');
+        clearIcon.style.display = 'none';
+
+        searchContainer.appendChild(iconSearch);
+        searchContainer.appendChild(searchInput);
+        searchContainer.appendChild(clearIcon);
+        content.appendChild(searchContainer);
+
+        // Nettoyage des doublons en normalisant les appareils en minuscules
+        const appliancesList = [...new Set(
+            recipes.map(recipe => recipe.appliance.toLowerCase())
+        )];
+
+        const listContainer = document.createElement('div');
+        listContainer.className = 'appliances-list-container';
+        content.appendChild(listContainer);
+
+        function displayList(filteredItems) {
+            listContainer.innerHTML = '';
+            filteredItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item';
+                itemElement.textContent = item;
+                itemElement.addEventListener('click', () => {
+                    selectCallback(item);
+                });
+                listContainer.appendChild(itemElement);
+            });
+        }
+
+        displayList(appliancesList);
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            clearIcon.style.display = query ? 'block' : 'none';
+            const filteredItems = appliancesList.filter(item =>
+                item.toLowerCase().includes(query)
+            );
+            displayList(filteredItems);
+        });
+
+        clearIcon.addEventListener('click', () => {
+            searchInput.value = '';
+            clearIcon.style.display = 'none';
+            displayList(appliancesList);
+        });
+    }
+}
+
+// Fonction pour créer la zone de recherche des ustensiles
+function createUstensilsSearch(content, recipes, selectCallback) {
+    if (!content.querySelector('.search-filters')) {
+        const searchContainer = document.createElement('div');
+        searchContainer.style.position = 'sticky';
+        searchContainer.style.top = '0';
+        searchContainer.style.backgroundColor = 'white';
+        searchContainer.style.zIndex = '1';
+        searchContainer.style.padding = '10px 0 0 0';
+
+        const searchInput = document.createElement('input');
+        searchInput.classList.add('search-filters');
+        searchInput.setAttribute('type', 'search');
+        searchInput.setAttribute('id', 'ustensils');
+        searchInput.setAttribute('name', 'ustensils');
+        searchInput.setAttribute('aria-label', 'rechercher parmi les ustensiles');
+
+        const iconSearch = document.createElement('i');
+        iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
+        iconSearch.setAttribute('aria-hidden', 'true');
+
+        const clearIcon = document.createElement('i');
+        clearIcon.className = 'fa-solid fa-xmark clear-icon';
+        clearIcon.setAttribute('aria-label', 'croix pour supprimer la saisie');
+        clearIcon.style.display = 'none';
+
+        searchContainer.appendChild(iconSearch);
+        searchContainer.appendChild(searchInput);
+        searchContainer.appendChild(clearIcon);
+        content.appendChild(searchContainer);
+
+        // Nettoyage des doublons en normalisant les ustensiles en minuscules
+        const ustensilsList = [...new Set(
+            recipes.flatMap(recipe => recipe.ustensils.map(ust => ust.toLowerCase()))
+        )];
+
+        const listContainer = document.createElement('div');
+        listContainer.className = 'ustensils-list-container';
+        content.appendChild(listContainer);
+
+        function displayList(filteredItems) {
+            listContainer.innerHTML = '';
+            filteredItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item';
+                itemElement.textContent = item;
+                itemElement.addEventListener('click', () => {
+                    selectCallback(item);
+                });
+                listContainer.appendChild(itemElement);
+            });
+        }
+
+        displayList(ustensilsList);
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            clearIcon.style.display = query ? 'block' : 'none';
+            const filteredItems = ustensilsList.filter(item =>
+                item.toLowerCase().includes(query)
+            );
+            displayList(filteredItems);
+        });
+
+        clearIcon.addEventListener('click', () => {
+            searchInput.value = '';
+            clearIcon.style.display = 'none';
+            displayList(ustensilsList);
         });
     }
 }

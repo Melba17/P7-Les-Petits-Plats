@@ -230,13 +230,14 @@ input[type="search"]::-webkit-search-cancel-button {
   appearance: none;
 }
 
-.ingredient-item {
+.item {
   padding: 1.2px 18px;
 }
-.ingredient-item:hover {
+
+.item:hover {
   background-color: #ffd15b;
   width: 100%;
-  font-weight: 600;  
+  font-weight: 600;
 }
 
 .counter {
@@ -279,10 +280,18 @@ input[type="search"]::-webkit-search-cancel-button {
 /*** Conteneur pour les options sélectionnées ***/
 .options-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 15px;
-  margin-top: -25px; /* Ajuste cette valeur selon la disposition désirée */
-  
+  margin-top: -25px;
+  width: auto;
+  flex-wrap: wrap; 
+}
+
+.options-container .selected-item {
+  margin-left: 90px;
+  margin-right: -35px; 
+  padding: 15px 18px; 
 }
 
 /***** CARTES RECETTES *****/
