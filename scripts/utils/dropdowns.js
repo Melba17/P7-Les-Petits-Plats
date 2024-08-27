@@ -1,3 +1,9 @@
+////////////////////////// ROLE DU FICHIER DROPDOWNS.JS ///////////////////////////////////////////////////////////////////////////
+///// Création des filtres : Il crée les boutons et les menus déroulants pour les filtres (par exemple, pour les ingrédients, appareils et ustensiles) sur la page.
+///// Gestion des menus déroulants : Il gère l'affichage et le comportement des menus lorsque l'utilisateur clique dessus (par exemple, ouvrir ou fermer le menu).
+/////// EN BREF : s’occupe de comment les utilisateurs peuvent faire leurs choix (créer et gérer les menus de filtres).
+
+
 // Fonction pour créer les boutons de filtre
 export function createFiltersButtons(recipes, selectIngredientCallback, selectApplianceCallback, selectUstensilCallback) {
     const filtersButtonsDiv = document.querySelector('.dropdowns');
@@ -162,6 +168,7 @@ function createIngredientsSearch(content, recipes, selectCallback) {
         searchInput.setAttribute('id', 'ingredients');
         searchInput.setAttribute('name', 'ingredients');
         searchInput.setAttribute('aria-label', 'rechercher parmi les ingrédients');
+        searchInput.setAttribute("tabindex", "0");
 
         const iconSearch = document.createElement('i');
         iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
@@ -192,6 +199,7 @@ function createIngredientsSearch(content, recipes, selectCallback) {
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item';
                 itemElement.textContent = item;
+                itemElement.setAttribute("tabindex", "0");
                 itemElement.addEventListener('click', () => {
                     selectCallback(item);
                 });
@@ -234,6 +242,7 @@ function createAppliancesSearch(content, recipes, selectCallback) {
         searchInput.setAttribute('id', 'appliances');
         searchInput.setAttribute('name', 'appliances');
         searchInput.setAttribute('aria-label', 'rechercher parmi les appareils');
+        searchInput.setAttribute("tabindex", "0");
 
         const iconSearch = document.createElement('i');
         iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
@@ -264,6 +273,7 @@ function createAppliancesSearch(content, recipes, selectCallback) {
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item';
                 itemElement.textContent = item;
+                itemElement.setAttribute("tabindex", "0");
                 itemElement.addEventListener('click', () => {
                     selectCallback(item);
                 });
@@ -306,6 +316,7 @@ function createUstensilsSearch(content, recipes, selectCallback) {
         searchInput.setAttribute('id', 'ustensils');
         searchInput.setAttribute('name', 'ustensils');
         searchInput.setAttribute('aria-label', 'rechercher parmi les ustensiles');
+        searchInput.setAttribute("tabindex", "0");
 
         const iconSearch = document.createElement('i');
         iconSearch.className = 'fa-solid fa-magnifying-glass filters-icon';
@@ -336,6 +347,7 @@ function createUstensilsSearch(content, recipes, selectCallback) {
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item';
                 itemElement.textContent = item;
+                itemElement.setAttribute("tabindex", "0");
                 itemElement.addEventListener('click', () => {
                     selectCallback(item);
                 });

@@ -136,7 +136,7 @@ h1 {
   background-color: white;
   color: black;
   border-style: none;
-  padding: 15px 18px;
+  padding: 15px 12px;
   border-radius: 8px;
   font-size: 16px;
   width: 190px;
@@ -179,7 +179,7 @@ h1 {
   padding-top: 0;
 }
 
-/* Barre de recherche à l'intérieur du menu d&roulant */
+/* Barre de recherche à l'intérieur du menu déroulant */
 .search-filters {
   width: 155px;
   padding: 5px;
@@ -231,6 +231,7 @@ input[type="search"]::-webkit-search-cancel-button {
   appearance: none;
 }
 
+/* positionnement des item dans le menu déroulant */
 .item {
   padding: 1.2px 18px;
 }
@@ -241,6 +242,7 @@ input[type="search"]::-webkit-search-cancel-button {
   font-weight: 600;
 }
 
+/* compteur du nombre de cartes recettes, à droite de l'écran */
 .counter {
   font-family: "Anton", sans-serif;
   color: black;
@@ -251,7 +253,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 
-/*** Pour les options sélectionnées par l'utilisateur au-dessous des boutons de filtres ****/
+/*** Pour les options sélectionnées par l'utilisateur au-dessous des boutons de filtres ***/
 .selected-item {
   display: block; /* Caché par défaut */
   font-family: "Manrope", sans-serif;
@@ -268,13 +270,27 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .cross-item {
   position: absolute;
-  right: 10px; 
+  right: 6px; 
   cursor: pointer;
   color: black;
   width: 20px;
   height: 20px;
   top: 57%;
   transform: translateY(-50%);
+}
+
+.error-message {
+  display: block; /* Caché par défaut */
+  font-family: "Manrope", sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  color: black;
+  background-color: #ffb700;
+  padding: 15px 18px;
+  border-radius: 8px;
+  width: 190px; 
+  position: relative;
+  width: 1230px;
 }
 
 
@@ -292,7 +308,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .options-container .selected-item {
   margin-left: 90px;
   margin-right: -35px; 
-  padding: 15px 18px; 
+  padding: 15px 12px; 
 }
 
 /***** CARTES RECETTES *****/
@@ -302,7 +318,7 @@ input[type="search"]::-webkit-search-cancel-button {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 60px 42px;
   margin: 0 90px 180px 90px;
-  transition: margin-top 0.3s ease; /* Pour un ajustement fluide */
+  transition: margin-top 0.3s ease-in-out; /* Pour un ajustement fluide */
 }
 
 /** Composition carte ***/
