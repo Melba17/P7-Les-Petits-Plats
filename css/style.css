@@ -94,6 +94,7 @@ h1 {
 
 /* Croix */
 .cross-icon {
+  display: none; /* Cache la croix par défaut */
   position: absolute;
   right: 55px; 
   cursor: pointer;
@@ -102,6 +103,10 @@ h1 {
   height: 20px;
   top: 55%;
   transform: translateY(-50%);
+}
+
+.cross-icon.visible {
+  display: inline; /* Affiche la croix lorsqu'elle est visible */
 }
 
 .cross-icon:hover {

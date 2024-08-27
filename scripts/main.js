@@ -7,9 +7,10 @@ import { createFiltersButtons } from './utils/dropdowns.js';
 /////// Filtrage des recettes : Il choisit quelles recettes afficher en fonction des filtres que l'utilisateur a sélectionnés.
 /////// Affichage des recettes : Il montre les recettes sur la page.
 /////// Gestion des sélections : Il garde une trace des ingrédients, appareils et ustensiles que l'utilisateur a sélectionnés pour filtrer les recettes.
+////// Affichage et gestion du compteur.
 /////// EN BREF : s’occupe de quoi afficher (les recettes filtrées) et comment les afficher en fonction des choix de l'utilisateur.
 
-// Variables globales pour stocker les sélections
+// Variables globales pour stocker les options/items
 let selectedIngredients = [];
 let selectedAppliances = [];
 let selectedUstensils = [];
@@ -301,16 +302,29 @@ function updateSelectedItems() {
 
 // Fonction pour créer le conteneur des éléments sélectionnés si nécessaire
 function createOptionsContainer() {
+    // Crée un nouvel élément <div> en mémoire
     const optionsContainer = document.createElement('div');
+
+    // Assigne la classe 'options-container' à cet élément <div>
     optionsContainer.className = 'options-container';
+
+    // Sélectionne le premier élément du DOM avec la classe 'flex'
     const flexContainer = document.querySelector('.flex');
+
+    // Vérifie si l'élément avec la classe 'flex' a été trouvé dans le DOM
     if (flexContainer) {
+        // Insère le nouvel élément <div> (optionsContainer) juste après l'élément 'flexContainer'
+        // parentNode fait référence au parent de 'flexContainer', et nextSibling est le frère suivant de 'flexContainer'
         flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);
     } else {
+        // Si aucun élément avec la classe 'flex' n'a été trouvé, affiche un message d'erreur dans la console
         console.error('.flex non trouvé pour créer le conteneur');
     }
+
+    // Retourne le nouvel élément <div> créé
     return optionsContainer;
 }
+
 
 ///// Fonction d'initialisation principale pour gérer l'affichage initial des recettes et des filtres
 function initialize() {
@@ -321,3 +335,34 @@ function initialize() {
 }
 
 initialize();  // Appelle la fonction d'initialisation
+
+
+// Ajout de la fonction pour gérer l'affichage de la croix dans la barre de recherche
+function handleSearchInput() {
+    const searchInput = document.querySelector('.searchbar');
+    const crossIcon = document.querySelector('.cross-icon');
+
+    // Vérifie si les éléments sont présents dans le DOM
+    if (searchInput && crossIcon) {
+        // Écoute les changements de l'input
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length > 0) {
+                crossIcon.classList.add('visible'); // Affiche la croix
+            } else {
+                crossIcon.classList.remove('visible'); // Cache la croix
+            }
+        });
+
+        // Ajoute un événement pour le clic sur la croix, qui vide l'input et cache la croix
+        crossIcon.addEventListener('click', () => {
+            searchInput.value = ''; // Vide l'input
+            crossIcon.classList.remove('visible'); // Cache la croix
+            searchInput.focus(); // Replace le focus sur l'input
+        });
+    } else {
+        console.error('.searchbar ou .cross-icon non trouvé');
+    }
+}
+
+// Appelle la fonction après le chargement de la page
+handleSearchInput();
