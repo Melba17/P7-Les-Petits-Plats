@@ -8,7 +8,7 @@ import { createFiltersButtons } from './utils/dropdowns.js';
 /////// Affichage des recettes : Il montre les recettes sur la page.
 /////// Gestion des sélections : Il garde une trace des ingrédients, appareils et ustensiles que l'utilisateur a sélectionnés pour filtrer les recettes.
 ////// Affichage et gestion du compteur.
-/////// EN BREF : s’occupe de quoi afficher (les recettes filtrées) et comment les afficher en fonction des choix de l'utilisateur.
+/////// EN BREF, s’occupe de : quoi afficher (les recettes filtrées) et comment les afficher en fonction des choix de l'utilisateur.
 
 // Variables globales pour stocker les options/items
 let selectedIngredients = [];
@@ -30,36 +30,8 @@ function showRecipeCards(recipes) {
             const card = new TemplateCards(recipe);
             cardSection.appendChild(card.display());
         });
-
-        // Supprimer le message d'erreur si des recettes sont affichées
-        const errorMessage = document.querySelector('.error-message');
-        if (errorMessage) {
-            errorMessage.remove();
-        }
     } else {
         console.error('.grid non trouvé');
-    }
-}
-
-// Fonction pour afficher le message d'erreur
-function showError() {
-    const cardSection = document.querySelector(".grid");
-    if (cardSection) {
-        cardSection.innerHTML = ''; // Vide la section des cartes
-
-        // Créer le message d'erreur
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'error-message';
-        errorMessage.innerHTML = 'Aucune recette ne correspond à votre recherche <i class="fa-solid fa-xmark cross-item" aria-label="fermer le message"></i>';
-
-        // Ajouter l'événement pour fermer le message
-        errorMessage.querySelector('.cross-item').addEventListener('click', () => {
-            errorMessage.remove();
-        });
-
-        cardSection.appendChild(errorMessage);
-    } else {
-        console.error('.grid non trouvé pour afficher le message d\'erreur');
     }
 }
 
@@ -105,13 +77,8 @@ function filterAndShowRecipes() {
         )
     );
 
-    if (filteredRecipes.length > 0) {
-        // Affiche les cartes de recettes filtrées
-        showRecipeCards(filteredRecipes);
-    } else {
-        showError(); // Affiche le message d'erreur si aucune recette n'est trouvée
-    }
-    
+    showRecipeCards(filteredRecipes);
+
     // Met à jour le compteur de recettes avec le nombre de recettes filtrées
     updateRecipeCounter(filteredRecipes.length);
 }
@@ -300,7 +267,7 @@ function updateSelectedItems() {
     });
 }
 
-// Fonction pour créer le conteneur des éléments sélectionnés si nécessaire
+// Fonction pour créer le conteneur des éléments sélectionnés selon nécessité
 function createOptionsContainer() {
     // Crée un nouvel élément <div> en mémoire
     const optionsContainer = document.createElement('div');
@@ -320,7 +287,6 @@ function createOptionsContainer() {
         // Si aucun élément avec la classe 'flex' n'a été trouvé, affiche un message d'erreur dans la console
         console.error('.flex non trouvé pour créer le conteneur');
     }
-
     // Retourne le nouvel élément <div> créé
     return optionsContainer;
 }

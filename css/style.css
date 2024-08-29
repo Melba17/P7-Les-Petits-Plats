@@ -141,7 +141,7 @@ h1 {
   background-color: white;
   color: black;
   border-style: none;
-  padding: 15px 12px;
+  padding: 15px 15px;
   border-radius: 8px;
   font-size: 16px;
   width: 190px;
@@ -241,10 +241,12 @@ input[type="search"]::-webkit-search-cancel-button {
   padding: 1.2px 18px;
 }
 
-.item:hover {
+.item:hover,
+.item:focus-visible {
   background-color: #ffd15b;
   width: 100%;
   font-weight: 600;
+  outline: none;
 }
 
 /* compteur du nombre de cartes recettes, à droite de l'écran */
