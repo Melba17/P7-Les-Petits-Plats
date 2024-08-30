@@ -13,11 +13,13 @@ function createSearchArea(content, items, selectCallback) {
             style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px 0 0 0;'
         });
 
+        const uniqueId = `search-${items[0].type}-${Date.now()}`; // Utilisation de Date.now() pour garantir l'unicité
+
         const searchInput = createElement('input', {
             type: 'search',
             class: 'search-filters',
-            id: `${items[0].type}`,
-            name: `${items[0].type}`,
+            id: uniqueId,
+            name: uniqueId,
             'aria-label': `rechercher parmi les ${items[0].type}`,
             tabindex: '0'
         });
@@ -69,6 +71,7 @@ function createSearchArea(content, items, selectCallback) {
     }
 }
 
+
 // Fonction pour créer un menu déroulant générique
 function createDropdown(id, label, recipes, selectCallback, createSearchFunction) {
     let dropdownWrapper = document.querySelector(`#${id}`);
@@ -102,6 +105,7 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
         filtersButtonsDOM(button, content, button.querySelector('.dropdown-icon'), recipes, selectCallback, createSearchFunction);
     }
 }
+
 
 // Fonction pour créer les boutons de filtre
 export function createFiltersButtons(recipes, selectIngredientCallback, selectApplianceCallback, selectUstensilCallback) {
