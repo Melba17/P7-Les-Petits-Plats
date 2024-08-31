@@ -215,6 +215,7 @@ h1 {
 
 /* Croix */
 .clear-icon {
+  display: none;
   position: absolute;
   right: 45px; 
   cursor: pointer;
