@@ -1,3 +1,10 @@
+// Générateur d'ID unique
+let idCounter = 0;
+function generateUniqueId(prefix = '') {
+    idCounter += 1;
+    return `${prefix}-${idCounter}`;
+}
+
 // Fonction utilitaire pour créer un élément avec ses attributs et enfants
 function createElement(type, attributes = {}, children = []) {
     const element = document.createElement(type);
@@ -6,7 +13,7 @@ function createElement(type, attributes = {}, children = []) {
     return element;
 }
 
-// Cette fonction fournit un mécanisme interactif pour rechercher et filtrer une liste d'éléments en temps réel, avec une interface utilisateur comprenant un champ de recherche, une icône de recherche, et une icône de suppression pour vider la recherche
+// Fonction pour créer une zone de recherche avec des ID uniques
 function createSearchArea(listContainer, items, selectCallback) {
     // Crée un conteneur pour la recherche
     const searchContainer = createElement('div', {
@@ -14,7 +21,7 @@ function createSearchArea(listContainer, items, selectCallback) {
     });
 
     // Crée un ID unique pour le champ de recherche
-    const uniqueId = `search-${Date.now()}`;
+    const uniqueId = generateUniqueId('search');
 
     // Crée le champ de recherche
     const searchInput = createElement('input', {
@@ -94,6 +101,8 @@ function createSearchArea(listContainer, items, selectCallback) {
 
 
 
+
+
 // Fonction pour créer un menu déroulant générique dans l'interface utilisateur. Ce menu déroulant peut contenir une liste d'éléments que l'utilisateur peut sélectionner. 
 function createDropdown(id, label, recipes, selectCallback, createSearchFunction) {
     // Essaie de trouver un élément existant avec l'ID spécifié
@@ -157,6 +166,7 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
         }
     }
 }
+
 
 
 
