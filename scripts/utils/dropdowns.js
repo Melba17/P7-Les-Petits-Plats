@@ -20,8 +20,8 @@ function createSearchArea(listContainer, items, selectCallback) {
     const searchInput = createElement('input', {
         type: 'search',
         class: 'search-filters',
-        id: uniqueId,
-        name: uniqueId,
+        id: uniqueId, // Utilisation d'un ID unique
+        name: uniqueId, // Utilisation d'un ID unique
         'aria-label': `Rechercher parmi les éléments`,
         tabindex: '0'
     });
@@ -92,6 +92,8 @@ function createSearchArea(listContainer, items, selectCallback) {
 
 
 
+
+
 // Fonction pour créer un menu déroulant générique dans l'interface utilisateur. Ce menu déroulant peut contenir une liste d'éléments que l'utilisateur peut sélectionner. 
 function createDropdown(id, label, recipes, selectCallback, createSearchFunction) {
     // Essaie de trouver un élément existant avec l'ID spécifié
@@ -108,7 +110,7 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
         const button = createElement('button', {
             class: 'dropdown',
             type: 'button',
-            id: `${id}Button`,
+            id: `${id}Button`, // ID unique pour le bouton
             'aria-haspopup': 'listbox',
             'aria-expanded': 'false',
             'aria-label': `Filtre ${label.toLowerCase()}`
@@ -159,6 +161,8 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
 
 
 
+
+
 // Fonction pour créer les boutons de filtre
 export function createFiltersButtons(recipes, selectIngredientCallback, selectApplianceCallback, selectUstensilCallback) {
     if (!document.querySelector('.dropdowns')) {
@@ -166,44 +170,16 @@ export function createFiltersButtons(recipes, selectIngredientCallback, selectAp
         return;
     }
 
-    createDropdown('dropdownIngredients', 'Ingrédients', recipes, selectIngredientCallback, (content, recipes, selectCallback) => {
-        createSearchArea(content, recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)), selectCallback);
+    createDropdown('dropdownIngredients', 'Ingrédients', recipes, selectIngredientCallback, (listContainer, recipes, selectCallback) => {
+        createSearchArea(listContainer, recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)), selectCallback);
     });
 
-    createDropdown('dropdownAppliances', 'Appareils', recipes, selectApplianceCallback, (content, recipes, selectCallback) => {
-        createSearchArea(content, recipes.map(recipe => recipe.appliance), selectCallback);
+    createDropdown('dropdownAppliances', 'Appareils', recipes, selectApplianceCallback, (listContainer, recipes, selectCallback) => {
+        createSearchArea(listContainer, recipes.map(recipe => recipe.appliance), selectCallback);
     });
 
-    createDropdown('dropdownUstensils', 'Ustensiles', recipes, selectUstensilCallback, (content, recipes, selectCallback) => {
-        createSearchArea(content, recipes.flatMap(recipe => recipe.ustensils), selectCallback);
-    });
-}
-
-function filtersButtonsDOM(button, content, icon, recipes, selectCallback, createSearchFunction) {
-    button.addEventListener('click', () => {
-        const isExpanded = button.getAttribute("aria-expanded") === "true";
-        button.setAttribute("aria-expanded", !isExpanded);
-        button.classList.toggle('show');
-
-        if (icon) {
-            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
-
-        content.style.display = isExpanded ? 'none' : 'block';
-
-        if (!isExpanded) {
-            createSearchFunction(content, recipes, selectCallback);
-        }
-    });
-
-    content.addEventListener('click', (event) => {
-        if (event.target.classList.contains('item')) {
-            button.setAttribute("aria-expanded", "false");
-            button.classList.remove('show');
-            if (icon) {
-                icon.style.transform = 'rotate(0deg)';
-            }
-            content.style.display = 'none';
-        }
+    createDropdown('dropdownUstensils', 'Ustensiles', recipes, selectUstensilCallback, (listContainer, recipes, selectCallback) => {
+        createSearchArea(listContainer, recipes.flatMap(recipe => recipe.ustensils), selectCallback);
     });
 }
+
