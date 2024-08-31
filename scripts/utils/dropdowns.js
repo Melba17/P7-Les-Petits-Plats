@@ -6,70 +6,92 @@ function createElement(type, attributes = {}, children = []) {
     return element;
 }
 
-// Fonction pour créer une zone de recherche générique
 function createSearchArea(content, items, selectCallback) {
-    if (!content.querySelector('.search-filters')) {
-        const searchContainer = createElement('div', {
-            style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px 0 0 0;'
-        });
+    // Crée un conteneur pour la recherche
+    const searchContainer = createElement('div', {
+        style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px;'
+    });
 
-        const uniqueId = `search-${items[0].type}-${Date.now()}`; // Utilisation de Date.now() pour garantir l'unicité
+    // Crée un ID unique pour le champ de recherche
+    const uniqueId = `search-${Date.now()}`;
 
-        const searchInput = createElement('input', {
-            type: 'search',
-            class: 'search-filters',
-            id: uniqueId,
-            name: uniqueId,
-            'aria-label': `rechercher parmi les ${items[0].type}`,
-            tabindex: '0'
-        });
+    // Crée le champ de recherche
+    const searchInput = createElement('input', {
+        type: 'search',
+        class: 'search-filters',
+        id: uniqueId,
+        name: uniqueId,
+        'aria-label': `Rechercher parmi les éléments`,
+        tabindex: '0'
+    });
 
-        const iconSearch = createElement('i', {
-            class: 'fa-solid fa-magnifying-glass filters-icon',
-            'aria-hidden': 'true'
-        });
+    // Crée l'icône de recherche
+    const iconSearch = createElement('i', {
+        class: 'fa-solid fa-magnifying-glass filters-icon',
+        'aria-hidden': 'true'
+    });
 
-        const clearIcon = createElement('i', {
-            class: 'fa-solid fa-xmark clear-icon',
-            'aria-label': 'croix pour supprimer la saisie',
-            style: 'display: none;'
-        });
+    // Crée l'icône de suppression pour vider le champ de recherche
+    const clearIcon = createElement('i', {
+        class: 'fa-solid fa-xmark clear-icon',
+        'aria-label': 'Supprimer la saisie',
+        style: 'display: none; cursor: pointer;'
+    });
 
-        searchContainer.append(iconSearch, searchInput, clearIcon);
-        content.appendChild(searchContainer);
+    // Ajoute les éléments au conteneur de recherche
+    searchContainer.append(iconSearch, searchInput, clearIcon);
+    content.insertBefore(searchContainer, content.querySelector('.list-container'));
 
-        const listContainer = createElement('div', { class: `${items[0].type}-list-container` });
-        content.appendChild(listContainer);
-
-        function displayList(filteredItems) {
-            listContainer.innerHTML = '';
-            filteredItems.forEach(item => {
-                const itemElement = createElement('div', {
-                    class: 'item',
-                    tabindex: '0'
-                }, [document.createTextNode(item)]);
-                itemElement.addEventListener('click', () => selectCallback(item));
-                listContainer.appendChild(itemElement);
-            });
-        }
-
-        const uniqueItems = [...new Set(items.map(item => item.toLowerCase()))];
-        displayList(uniqueItems);
-
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value.toLowerCase().trim();
-            clearIcon.style.display = query ? 'block' : 'none';
-            const filteredItems = uniqueItems.filter(item => item.includes(query));
-            displayList(filteredItems);
-        });
-
-        clearIcon.addEventListener('click', () => {
-            searchInput.value = '';
-            clearIcon.style.display = 'none';
-            displayList(uniqueItems);
-        });
+    // Vide le conteneur de liste avant d'ajouter les nouveaux éléments
+    const listContainer = content.querySelector('.list-container');
+    if (listContainer) {
+        listContainer.innerHTML = ''; // Vide la liste avant d'ajouter de nouveaux éléments
     }
+
+    // Fonction pour afficher la liste des éléments
+    function displayList(filteredItems) {
+        if (listContainer) {
+            listContainer.innerHTML = ''; // Vide le conteneur avant d'ajouter les nouveaux éléments
+            if (filteredItems.length > 0) {
+                filteredItems.forEach(item => {
+                    const itemElement = createElement('div', {
+                        class: 'item',
+                        tabindex: '0'
+                    }, [document.createTextNode(item)]);
+                    itemElement.addEventListener('click', () => selectCallback(item));
+                    listContainer.appendChild(itemElement);
+                });
+            } else {
+                listContainer.innerHTML = '<div class="item">Aucun résultat trouvé</div>'; // Message pour aucun résultat
+            }
+        }
+    }
+
+    // Crée une liste unique des items pour éviter les doublons
+    const uniqueItems = [...new Set(items.map(item => item.toLowerCase()))];
+    displayList(uniqueItems); // Affiche la liste initiale
+
+    // Écoute les entrées de recherche pour filtrer les éléments
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        clearIcon.style.display = query ? 'block' : 'none'; // Affiche ou cache l'icône de suppression
+
+        // Filtre les éléments en fonction de la saisie
+        const filteredItems = uniqueItems.filter(item => item.includes(query));
+
+        // Affiche les éléments filtrés
+        displayList(filteredItems);
+    });
+
+    // Écoute le clic sur l'icône de suppression pour vider le champ de recherche
+    clearIcon.addEventListener('click', () => {
+        searchInput.value = ''; // Vide le champ de recherche
+        clearIcon.style.display = 'none'; // Cache l'icône de suppression
+        displayList(uniqueItems); // Affiche la liste complète
+    });
 }
+
+
 
 
 // Fonction pour créer un menu déroulant générique
@@ -87,7 +109,7 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
             id: `${id}Button`,
             'aria-haspopup': 'listbox',
             'aria-expanded': 'false',
-            'aria-label': `filtre ${label.toLowerCase()}`
+            'aria-label': `Filtre ${label.toLowerCase()}`
         }, [
             createElement('span', {}, [document.createTextNode(label)]),
             createElement('i', { class: 'fa-solid fa-angle-down dropdown-icon' })
@@ -96,15 +118,29 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
         const content = createElement('div', {
             class: 'dropdown-content',
             role: 'listbox',
-            'aria-labelledby': `${id}Button`
+            'aria-labelledby': `${id}Button`,
+            style: 'display: none; max-height: 300px; overflow-y: auto;' 
         });
 
         dropdownWrapper.append(button, content);
         document.querySelector('.dropdowns').appendChild(dropdownWrapper);
+        
+        // Ajoute un conteneur pour la liste des éléments
+        const listContainer = createElement('div', { class: 'list-container' });
+        content.appendChild(listContainer);
 
         filtersButtonsDOM(button, content, button.querySelector('.dropdown-icon'), recipes, selectCallback, createSearchFunction);
+    } else {
+        // Mise à jour du conteneur de liste existant
+        const content = dropdownWrapper.querySelector('.dropdown-content');
+        const listContainer = content.querySelector('.list-container');
+        if (listContainer) {
+            // Assurez-vous que la fonction de recherche est correctement mise à jour
+            createSearchFunction(listContainer, recipes, selectCallback);
+        }
     }
 }
+
 
 
 // Fonction pour créer les boutons de filtre
@@ -127,7 +163,6 @@ export function createFiltersButtons(recipes, selectIngredientCallback, selectAp
     });
 }
 
-// Fonction pour gérer les événements sur les boutons de filtre
 function filtersButtonsDOM(button, content, icon, recipes, selectCallback, createSearchFunction) {
     button.addEventListener('click', () => {
         const isExpanded = button.getAttribute("aria-expanded") === "true";
