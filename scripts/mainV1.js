@@ -1,7 +1,7 @@
 // Importation des modules
 import { recipes } from './api/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
-import { createFiltersButtons } from './utils/dropdowns.js';
+import { createFiltersButtons, createSearchArea } from './utils/dropdowns.js';
 
 // Variables globales pour stocker les options/items
 let selectedIngredients = [];
@@ -253,32 +253,37 @@ function updateDropdownOptions(filteredRecipes) {
         recipe.ustensils.forEach(ust => ustensils.add(ust.toLowerCase()));
     });
 
-    updateDropdown('dropdownIngredients', Array.from(ingredients));
-    updateDropdown('dropdownAppliances', Array.from(appliances));
-    updateDropdown('dropdownUstensils', Array.from(ustensils));
+    updateDropdown('dropdownIngredients', Array.from(ingredients), 'ingredients');
+    updateDropdown('dropdownAppliances', Array.from(appliances), 'appliances');
+    updateDropdown('dropdownUstensils', Array.from(ustensils), 'ustensils');
 }
 
+
 // Fonction pour mettre à jour une liste déroulante spécifique
-function updateDropdown(id, items) {
-    const dropdownList = document.querySelector(`#${id} .dropdown-content`);
+function updateDropdown(id, items, type) {
+    const dropdownList = document.querySelector(`#${id} .list-container`);
+
     if (dropdownList) {
-        dropdownList.innerHTML = '';
+        dropdownList.innerHTML = ''; // On vide la liste des éléments
+
+        // Remplir la liste d'items
         items.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'item';
+            itemElement.tabIndex = '0';
             itemElement.textContent = item;
             itemElement.addEventListener('click', () => {
-                if (id === 'dropdownIngredients') {
+                if (type === 'ingredients') {
                     selectIngredient(item);
-                } else if (id === 'dropdownAppliances') {
+                } else if (type === 'appliances') {
                     selectAppliance(item);
-                } else if (id === 'dropdownUstensils') {
+                } else if (type === 'ustensils') {
                     selectUstensil(item);
                 }
             });
             dropdownList.appendChild(itemElement);
         });
     } else {
-        console.error(`#${id} .dropdown-content non trouvé`);
+        console.error(`#${id} .list-container non trouvé`);
     }
 }

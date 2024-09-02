@@ -14,7 +14,7 @@ function createElement(type, attributes = {}, children = []) {
 }
 
 // Fonction pour créer une zone de recherche avec des ID uniques
-function createSearchArea(listContainer, items, selectCallback) {
+export function createSearchArea(listContainer, items, selectCallback) {
     // Crée un conteneur pour la recherche
     const searchContainer = createElement('div', {
         style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px;'
