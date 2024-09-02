@@ -99,10 +99,6 @@ export function createSearchArea(listContainer, items, selectCallback) {
 
 
 
-
-
-
-
 // Fonction pour créer un menu déroulant générique dans l'interface utilisateur. Ce menu déroulant peut contenir une liste d'éléments que l'utilisateur peut sélectionner. 
 function createDropdown(id, label, recipes, selectCallback, createSearchFunction) {
     // Essaie de trouver un élément existant avec l'ID spécifié
@@ -166,11 +162,6 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
         }
     }
 }
-
-
-
-
-
 
 
 // Fonction pour créer les boutons de filtre

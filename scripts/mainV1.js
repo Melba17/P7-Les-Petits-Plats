@@ -37,6 +37,7 @@ function updateRecipeCounter(count) {
     }
 }
 
+
 // Fonction pour filtrer et afficher les recettes
 function filterAndShowRecipes() {
     const data = getData();
@@ -55,7 +56,32 @@ function filterAndShowRecipes() {
     updateDropdownOptions(filteredRecipes);
     showRecipeCards(filteredRecipes);
     updateRecipeCounter(filteredRecipes.length);
+
+    const optionsContainer = document.querySelector('.options-container');
+    const errorContainer = document.querySelector('.error-container');
+
+    if (filteredRecipes.length === 0) {
+        if (optionsContainer) {
+            // Obtenez l'élément sélectionné
+            const lastSelectedItem = selectedIngredients[selectedIngredients.length - 1]
+                || selectedAppliances[selectedAppliances.length - 1]
+                || selectedUstensils[selectedUstensils.length - 1];
+
+            if (lastSelectedItem) {
+                // Crée ou met à jour la zone de message d'erreur
+                showError(errorContainer, lastSelectedItem);
+            }
+        }
+    } else {
+        // Supprimer le message d'erreur existant s'il y en a un
+        if (errorContainer) {
+            errorContainer.innerHTML = '';
+        }
+    }
 }
+
+
+
 
 // Fonction pour gérer la sélection des ingrédients
 function selectIngredient(ingredient) {
@@ -286,4 +312,32 @@ function updateDropdown(id, items, type) {
     } else {
         console.error(`#${id} .list-container non trouvé`);
     }
+}
+
+
+// Fonction pour afficher un message d'erreur
+function showError(container, item) {
+    // Si le conteneur d'erreurs n'existe pas encore, le créer
+    if (!container) {
+        const optionsContainer = document.querySelector('.options-container');
+        if (optionsContainer) {
+            // Crée une nouvelle div pour le message d'erreur
+            const newErrorContainer = document.createElement('div');
+            newErrorContainer.className = 'error-container';
+            optionsContainer.parentNode.insertBefore(newErrorContainer, optionsContainer.nextSibling);
+            container = newErrorContainer;
+        } else {
+            console.error('.options-container non trouvé pour ajouter le conteneur d\'erreur');
+            return;
+        }
+    }
+
+    // Crée le message d'erreur
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'error-message';
+    errorMessage.textContent = `Aucune recette ne contient '${item}'. Veuillez faire une nouvelle recherche, svp.`;
+
+    // Ajoute le message d'erreur au conteneur
+    container.innerHTML = ''; // Vide le conteneur avant d'ajouter un nouveau message
+    container.appendChild(errorMessage);
 }
