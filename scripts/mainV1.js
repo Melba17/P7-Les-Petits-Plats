@@ -3,12 +3,13 @@ import { recipes } from './api/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
 import { createFiltersButtons, createSearchArea } from './utils/dropdowns.js';
 
-// Variables globales pour stocker les options/items
+// Variables globales pour stocker les options/items et le dernier filtre sélectionné
 let selectedIngredients = [];
 let selectedAppliances = [];
 let selectedUstensils = [];
+let lastSelectedFilter = null;
 
-// Fonction pour récupérer les données des recettes
+// Fonction pour récupérer les données des recettes du fichier recipes.js
 function getData() {
     return recipes;
 }
@@ -37,7 +38,6 @@ function updateRecipeCounter(count) {
     }
 }
 
-
 // Fonction pour filtrer et afficher les recettes
 function filterAndShowRecipes() {
     const data = getData();
@@ -55,41 +55,48 @@ function filterAndShowRecipes() {
 
     updateDropdownOptions(filteredRecipes);
     showRecipeCards(filteredRecipes);
-    updateRecipeCounter(filteredRecipes.length);
+
+    // Mise à jour du compteur
+    if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
+        updateRecipeCounter(null); // Réinitialise le compteur à "1500 recettes"
+        resetGridMargin(); // Réinitialise la marge de la grille des cartes recettes à zéro
+    } else {
+        updateRecipeCounter(filteredRecipes.length); // Affiche le nombre de cartes recettes disponibles
+        adjustGridMargin();  // Ajuste la marge de la grille des cartes recettes à zéro
+    }
 
     const optionsContainer = document.querySelector('.options-container');
     const errorContainer = document.querySelector('.error-container');
 
     if (filteredRecipes.length === 0) {
         if (optionsContainer) {
-            // Obtenez l'élément sélectionné
-            const lastSelectedItem = selectedIngredients[selectedIngredients.length - 1]
-                || selectedAppliances[selectedAppliances.length - 1]
-                || selectedUstensils[selectedUstensils.length - 1];
-
-            if (lastSelectedItem) {
+            if (lastSelectedFilter) {
                 // Crée ou met à jour la zone de message d'erreur
-                showError(errorContainer, lastSelectedItem);
+                showError(errorContainer, lastSelectedFilter);
             }
         }
     } else {
-        // Supprimer le message d'erreur existant s'il y en a un
+        // Supprime le conteneur du message d'erreur existant s'il y en a un
         if (errorContainer) {
-            errorContainer.innerHTML = '';
+            errorContainer.remove();
         }
     }
 }
 
-
-
+// Fonction pour mettre à jour le dernier filtre sélectionné
+function updateLastSelectedFilter(filter) {
+    lastSelectedFilter = filter;
+}
 
 // Fonction pour gérer la sélection des ingrédients
 function selectIngredient(ingredient) {
     const index = selectedIngredients.indexOf(ingredient.toLowerCase());
     if (index === -1) {
         selectedIngredients.push(ingredient.toLowerCase());
+        updateLastSelectedFilter(ingredient);
     } else {
         selectedIngredients.splice(index, 1);
+        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
     }
     filterAndShowRecipes();
     updateSelectedItems();
@@ -102,8 +109,10 @@ function selectAppliance(appliance) {
     const index = selectedAppliances.indexOf(appliance.toLowerCase());
     if (index === -1) {
         selectedAppliances.push(appliance.toLowerCase());
+        updateLastSelectedFilter(appliance);
     } else {
         selectedAppliances.splice(index, 1);
+        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
     }
     filterAndShowRecipes();
     updateSelectedItems();
@@ -116,8 +125,10 @@ function selectUstensil(ustensil) {
     const index = selectedUstensils.indexOf(ustensil.toLowerCase());
     if (index === -1) {
         selectedUstensils.push(ustensil.toLowerCase());
+        updateLastSelectedFilter(ustensil);
     } else {
         selectedUstensils.splice(index, 1);
+        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
     }
     filterAndShowRecipes();
     updateSelectedItems();
@@ -141,13 +152,23 @@ function closeDropdown() {
     });
 }
 
-// Fonction pour ajuster la marge de la grille
+// Fonction pour ajuster la marge de la grille des cartes recettes 
 function adjustGridMargin() {
     const grid = document.querySelector('.grid');
     if (grid) {
         grid.style.marginTop = '30px';
     } else {
         console.log('.grid non trouvé');
+    }
+}
+
+// Fonction pour réinitialiser la marge de la grille des cartes recettes à zéro
+function resetGridMargin() {
+    const grid = document.querySelector('.grid');
+    if (grid) {
+        grid.style.marginTop = '0';
+    } else {
+        console.error('.grid non trouvé');
     }
 }
 
@@ -284,7 +305,6 @@ function updateDropdownOptions(filteredRecipes) {
     updateDropdown('dropdownUstensils', Array.from(ustensils), 'ustensils');
 }
 
-
 // Fonction pour mettre à jour une liste déroulante spécifique
 function updateDropdown(id, items, type) {
     const dropdownList = document.querySelector(`#${id} .list-container`);
@@ -314,7 +334,6 @@ function updateDropdown(id, items, type) {
     }
 }
 
-
 // Fonction pour afficher un message d'erreur
 function showError(container, item) {
     // Si le conteneur d'erreurs n'existe pas encore, le créer
@@ -331,7 +350,6 @@ function showError(container, item) {
             return;
         }
     }
-
     // Crée le message d'erreur
     const errorMessage = document.createElement('div');
     errorMessage.className = 'error-message';

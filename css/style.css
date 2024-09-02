@@ -278,7 +278,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .cross-item {
   position: absolute;
-  right: 6px; 
+  right: 0; 
   cursor: pointer;
   color: black;
   width: 20px;
@@ -301,7 +301,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .options-container .selected-item {
   margin-left: 90px;
   margin-right: -35px; 
-  padding: 15px 12px; 
+  padding: 15px 7px; 
 }
 
 .error-message {
