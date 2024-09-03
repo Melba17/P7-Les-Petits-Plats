@@ -1,3 +1,7 @@
+/* /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  mainv1.js : GESTION DE L'INTERACTION UTILISATEUR ET LOGIQUE DE FILTRAGE DES RECETTES
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
 // Importation des modules
 import { recipes } from './api/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
@@ -198,7 +202,7 @@ function updateDropdown(id, items, type) {
     }
 }
 
-// Fonction générique pour mettre à jour les éléments sélectionnés
+// Fonction pour afficher les éléments sélectionnés sous les boutons de filtre
 function updateSelectedItems() {
     const optionsContainer = document.querySelector('.options-container') || createOptionsContainer();
     optionsContainer.innerHTML = '';
@@ -227,6 +231,7 @@ function updateSelectedItems() {
             const selectedItem = document.createElement('div');
             selectedItem.className = 'selected-item';
             selectedItem.style.display = 'block';
+            selectedItem.tabIndex = '0'; // Rendre l'élément focusable
 
             const textContainer = document.createElement('span');
             textContainer.className = 'option-text';
@@ -243,6 +248,14 @@ function updateSelectedItems() {
 
             selectedItem.appendChild(closeIcon);
             optionsContainer.appendChild(selectedItem);
+
+            // Ajouter gestion des événements clavier pour les éléments sélectionnés
+            selectedItem.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    selectFunction(item);
+                }
+            });
         });
     }
 
@@ -251,6 +264,8 @@ function updateSelectedItems() {
     createSelectedItems('appliances');
     createSelectedItems('ustensils');
 }
+
+
 // Fonction pour créer le conteneur des éléments sélectionnés
 function createOptionsContainer() {
     const optionsContainer = document.createElement('div');

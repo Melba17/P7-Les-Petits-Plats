@@ -1,121 +1,35 @@
-// Générateur d'ID unique
-let idCounter = 0;
-function generateUniqueId(prefix = '') {
-    idCounter += 1;
-    return `${prefix}-${idCounter}`;
-}
+/* /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  dropdowns.js : AFFICHAGE ET COMPORTEMENT DES MENUS DÉROULANTS POUR LES FILTRES
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
-// Fonction utilitaire pour créer un élément avec ses attributs et enfants
-function createElement(type, attributes = {}, children = []) {
-    const element = document.createElement(type);
-    Object.keys(attributes).forEach(attr => element.setAttribute(attr, attributes[attr]));
-    children.forEach(child => element.appendChild(child));
-    return element;
-}
 
-// Fonction pour créer une zone de recherche avec des ID uniques
-function createSearchArea(listContainer, items, selectCallback) {
-    // Crée un conteneur pour la recherche
-    const searchContainer = createElement('div', {
-        style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px;'
-    });
-
-    // Crée un ID unique pour le champ de recherche
-    const uniqueId = generateUniqueId('search');
-
-    // Crée le champ de recherche
-    const searchInput = createElement('input', {
-        type: 'search',
-        class: 'search-filters',
-        id: uniqueId, // Utilisation d'un ID unique
-        name: uniqueId, // Utilisation d'un ID unique
-        'aria-label': `Rechercher parmi les éléments`,
-        tabindex: '0'
-    });
-
-    // Crée l'icône de recherche
-    const iconSearch = createElement('i', {
-        class: 'fa-solid fa-magnifying-glass filters-icon',
-        'aria-hidden': 'true'
-    });
-
-    // Crée l'icône de suppression pour vider le champ de recherche
-    const clearIcon = createElement('i', {
-        class: 'fa-solid fa-xmark clear-icon',
-        'aria-label': 'Supprimer la saisie'
-    });
-
-    // Ajoute les éléments au conteneur de recherche
-    searchContainer.append(iconSearch, searchInput, clearIcon);
-
-    // Insère le conteneur de recherche avant le conteneur de liste
-    listContainer.parentNode.insertBefore(searchContainer, listContainer);
-
-    // Vide le conteneur de liste avant d'ajouter les nouveaux éléments
-    listContainer.innerHTML = '';
-
-    // Fonction pour afficher la liste des éléments
-    function displayList(filteredItems) {
-        listContainer.innerHTML = ''; // Vide le conteneur avant d'ajouter les nouveaux éléments
-
-        // Si des éléments sont trouvés, ils sont ajoutés à la liste avec un gestionnaire d'événements
-        if (filteredItems.length > 0) {
-            filteredItems.forEach(item => {
-                const itemElement = createElement('div', {
-                    class: 'item',
-                    tabindex: '0'
-                }, [document.createTextNode(item)]);
-                itemElement.addEventListener('click', () => selectCallback(item));
-                listContainer.appendChild(itemElement);
-            });
-        } else {
-            listContainer.innerHTML = '<div class="item">Aucun résultat trouvé</div>'; // Message pour aucun résultat
-        }
+/* //////////////////////////////////////////
+   CRÉATION DES BOUTONS DE FILTRE
+////////////////////////////////////////// */
+export function createFiltersButtons(recipes, selectIngredientCallback, selectApplianceCallback, selectUstensilCallback) {
+    if (!document.querySelector('.dropdowns')) {
+        console.error("La div .dropdowns n'existe pas dans le DOM.");
+        return;
     }
 
-    // Les éléments sont convertis en minuscules et les doublons sont supprimés en utilisant un Set
-    const uniqueItems = [...new Set(items.map(item => item.toLowerCase()))];
-    displayList(uniqueItems); // Affiche la liste initiale
-
-    // Écoute les entrées de recherche pour filtrer les éléments
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value.toLowerCase().trim();
-        clearIcon.style.display = query ? 'block' : 'none'; // Affiche ou cache l'icône de suppression
-
-        // Filtre les éléments en fonction de la saisie
-        const filteredItems = uniqueItems.filter(item => item.includes(query));
-
-        // Affiche les éléments filtrés
-        displayList(filteredItems);
-    });
-
-    // Écoute le clic sur l'icône de suppression pour vider le champ de recherche
-    clearIcon.addEventListener('click', () => {
-        searchInput.value = ''; // Vide le champ de recherche
-        clearIcon.style.display = 'none'; // Cache l'icône de suppression
-        displayList(uniqueItems); // La liste complète des éléments est affichée de nouveau
-    });
+    createDropdown('dropdownIngredients', 'Ingrédients', recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)), selectIngredientCallback, createSearchArea);
+    createDropdown('dropdownAppliances', 'Appareils', recipes.map(recipe => recipe.appliance), selectApplianceCallback, createSearchArea);
+    createDropdown('dropdownUstensils', 'Ustensiles', recipes.flatMap(recipe => recipe.ustensils), selectUstensilCallback, createSearchArea);
 }
 
-
-
-// Fonction pour créer un menu déroulant générique dans l'interface utilisateur. Ce menu déroulant peut contenir une liste d'éléments que l'utilisateur peut sélectionner. 
-function createDropdown(id, label, recipes, selectCallback, createSearchFunction) {
-    // Essaie de trouver un élément existant avec l'ID spécifié
+/* //////////////////////////////////////////
+   CRÉATION D'UN MENU DÉROULANT
+////////////////////////////////////////// */
+function createDropdown(id, label, items, selectCallback, createSearchFunction) {
     let dropdownWrapper = document.querySelector(`#${id}`);
     
     if (!dropdownWrapper) {
-        // Un nouvel élément div est créé avec la classe dropdown-wrapper et l'ID fourni
-        dropdownWrapper = createElement('div', {
-            class: 'dropdown-wrapper',
-            id: id
-        });
+        dropdownWrapper = createElement('div', { class: 'dropdown-wrapper', id: id });
         
-        // Un bouton est créé pour déclencher l'ouverture du menu déroulant
         const button = createElement('button', {
             class: 'dropdown',
             type: 'button',
-            id: `${id}Button`, // ID unique pour le bouton
+            id: `${id}Button`,
             'aria-haspopup': 'listbox',
             'aria-expanded': 'false',
             'aria-label': `Filtre ${label.toLowerCase()}`
@@ -124,68 +38,165 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
             createElement('i', { class: 'fa-solid fa-angle-down dropdown-icon' })
         ]);
         
-        // Un élément div est créé pour contenir le contenu du menu déroulant
         const content = createElement('div', {
             class: 'dropdown-content',
             role: 'listbox',
-            'aria-labelledby': `${id}Button` 
+            'aria-labelledby': `${id}Button`
         });
         
-        // Le bouton et le conteneur de contenu sont ajoutés au dropdownWrapper
         dropdownWrapper.append(button, content);
         document.querySelector('.dropdowns').appendChild(dropdownWrapper);
         
-        // Un conteneur div supplémentaire est créé à l'intérieur de dropdown-content pour contenir les éléments de la liste
         const listContainer = createElement('div', { class: 'list-container' });
         content.appendChild(listContainer);
         
-        // Configure les filtres et la recherche
         if (createSearchFunction) {
-            createSearchFunction(listContainer, recipes, selectCallback);
+            createSearchFunction(listContainer, items, selectCallback);
         }
 
-        // Ajoute l'événement pour ouvrir/fermer le menu déroulant
         button.addEventListener('click', () => {
             const isExpanded = button.getAttribute('aria-expanded') === 'true';
-            button.setAttribute('aria-expanded', !isExpanded);
-            content.style.display = isExpanded ? 'none' : 'block';
-            
-            // Bascule la rotation de l'icône
-            const icon = button.querySelector('.dropdown-icon');
-            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+            toggleDropdownIcon(button, isExpanded);
+        });
+
+        // Ajouter gestion des événements clavier
+        listContainer.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                const focusedItem = document.activeElement;
+                if (focusedItem.classList.contains('item')) {
+                    selectCallback(focusedItem.textContent);
+                }
+            }
         });
 
     } else {
-        // Mise à jour du conteneur de liste existant
         const content = dropdownWrapper.querySelector('.dropdown-content');
         const listContainer = content.querySelector('.list-container');
-        
-        // Réinitialiser ou mettre à jour la liste des éléments affichés
         if (createSearchFunction) {
-            createSearchFunction(listContainer, recipes, selectCallback);
+            createSearchFunction(listContainer, items, selectCallback);
         }
     }
+
+    // Mettre à jour l'icône lorsque vous sélectionnez un élément
+    const listContainer = dropdownWrapper.querySelector('.list-container');
+    listContainer.addEventListener('click', (event) => {
+        if (event.target.classList.contains('item')) {
+            const button = dropdownWrapper.querySelector('.dropdown');
+            toggleDropdownIcon(button, true); // Passer true pour fermer le menu
+        }
+    });
 }
 
 
+/* //////////////////////////////////////////
+   GESTION DE L'ICÔNE DU MENU DÉROULANT
+////////////////////////////////////////// */
+function toggleDropdownIcon(button, isExpanded) {
+    button.setAttribute('aria-expanded', !isExpanded);
+    const icon = button.querySelector('.dropdown-icon');
+    icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    const content = button.nextElementSibling;
+    content.style.display = isExpanded ? 'none' : 'block';
+}
 
-// Fonction pour créer les boutons de filtre
-export function createFiltersButtons(recipes, selectIngredientCallback, selectApplianceCallback, selectUstensilCallback) {
-    if (!document.querySelector('.dropdowns')) {
-        console.error("La div .dropdowns n'existe pas dans le DOM.");
-        return;
+/* //////////////////////////////////////////
+   CRÉATION DE LA ZONE DE RECHERCHE
+////////////////////////////////////////// */
+// Création de la zone de recherche
+function createSearchArea(listContainer, items, selectCallback) {
+    const searchContainer = createElement('div', {
+        style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px;'
+    });
+
+    const uniqueId = generateUniqueId('search');
+    const searchInput = createElement('input', {
+        type: 'search',
+        class: 'search-filters',
+        id: uniqueId,
+        name: uniqueId,
+        'aria-label': 'Rechercher parmi les éléments',
+        tabindex: '0'
+    });
+
+    const iconSearch = createElement('i', {
+        class: 'fa-solid fa-magnifying-glass filters-icon',
+        'aria-hidden': 'true'
+    });
+
+    const clearIcon = createElement('i', {
+        class: 'fa-solid fa-xmark clear-icon',
+        'aria-label': 'Supprimer la saisie',
+        tabindex: '0' // Rendre la croix focusable
+    });
+
+    searchContainer.append(iconSearch, searchInput, clearIcon);
+    listContainer.parentNode.insertBefore(searchContainer, listContainer);
+
+    const uniqueItems = [...new Set(items.map(item => item.toLowerCase()))];
+    displayList(listContainer, uniqueItems, selectCallback);
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        clearIcon.style.display = query ? 'block' : 'none';
+        const filteredItems = uniqueItems.filter(item => item.includes(query));
+        displayList(listContainer, filteredItems, selectCallback);
+    });
+
+    clearIcon.addEventListener('click', () => {
+        searchInput.value = '';
+        clearIcon.style.display = 'none';
+        searchInput.focus(); // Re-focus sur le champ de recherche après la suppression
+        displayList(listContainer, uniqueItems, selectCallback);
+    });
+
+    // Gestion des événements clavier pour la croix
+    clearIcon.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault(); // Empêcher l'action par défaut de l'événement
+            searchInput.value = ''; // Effacer le texte de la recherche
+            clearIcon.style.display = 'none'; // Masquer la croix
+            displayList(listContainer, uniqueItems, selectCallback); // Réafficher la liste complète
+            searchInput.focus(); // Re-focus sur le champ de recherche
+        }
+    });
+}
+
+
+/* //////////////////////////////////////////
+   AFFICHAGE DE LA LISTE DES ÉLÉMENTS
+////////////////////////////////////////// */
+function displayList(listContainer, items, selectCallback) {
+    listContainer.innerHTML = ''; // Vide le conteneur avant d'ajouter les nouveaux éléments
+
+    if (items.length > 0) {
+        items.forEach(item => {
+            const itemElement = createElement('div', { class: 'item', tabindex: '0' }, [document.createTextNode(item)]);
+            itemElement.addEventListener('click', () => selectCallback(item));
+            listContainer.appendChild(itemElement);
+        });
+    } else {
+        const noResults = createElement('div', { class: 'item' }, [document.createTextNode('Aucun résultat trouvé')]);
+        listContainer.appendChild(noResults);
     }
-
-    createDropdown('dropdownIngredients', 'Ingrédients', recipes, selectIngredientCallback, (listContainer, recipes, selectCallback) => {
-        createSearchArea(listContainer, recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)), selectCallback);
-    });
-
-    createDropdown('dropdownAppliances', 'Appareils', recipes, selectApplianceCallback, (listContainer, recipes, selectCallback) => {
-        createSearchArea(listContainer, recipes.map(recipe => recipe.appliance), selectCallback);
-    });
-
-    createDropdown('dropdownUstensils', 'Ustensiles', recipes, selectUstensilCallback, (listContainer, recipes, selectCallback) => {
-        createSearchArea(listContainer, recipes.flatMap(recipe => recipe.ustensils), selectCallback);
-    });
 }
 
+/* //////////////////////////////////////////////////////////////////////////
+   FONCTION UTILE POUR CRÉER DES ÉLÉMENTS AVEC DES ATTRIBUTS ET DES ENFANTS /
+   CENTRALISATION DE LA LOGIQUE DE CREATION DES ELEMENTS HTML 
+///////////////////////////////////////////////////////////////////////// */
+function createElement(type, attributes = {}, children = []) {
+    const element = document.createElement(type);
+    Object.keys(attributes).forEach(attr => element.setAttribute(attr, attributes[attr]));
+    children.forEach(child => element.appendChild(child));
+    return element;
+}
+
+/* ////////////////////////////////////////////////////////////////////////////////////
+   GÉNÉRATEUR D'ID UNIQUE POUR CHAQUE BARRE DE RECHERCHE DANS LES MENUS DEROULANTS
+//////////////////////////////////////////////////////////////////////////////////// */
+let idCounter = 0;
+function generateUniqueId(prefix = '') {
+    idCounter += 1;
+    return `${prefix}-${idCounter}`; // retourne search-1, search-2, search-3 
+}
