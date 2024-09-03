@@ -325,6 +325,11 @@ input[type="search"]::-webkit-search-cancel-button {
   margin-top: 30px;
 }
 
+.error-item {
+  color: blue;
+  font-weight: bold; 
+}
+
 
 /***** CARTES RECETTES *****/
 /*** Ajuste la marge pour tenir compte de l'option sélectionnée ***/

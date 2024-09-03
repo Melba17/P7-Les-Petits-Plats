@@ -1,13 +1,17 @@
 // Importation des modules
 import { recipes } from './api/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
-import { createFiltersButtons, createSearchArea } from './utils/dropdowns.js';
+import { createFiltersButtons } from './utils/dropdowns.js';
 
 // Variables globales pour stocker les options/items et le dernier filtre sélectionné
 let selectedIngredients = [];
 let selectedAppliances = [];
 let selectedUstensils = [];
 let lastSelectedFilter = null;
+
+/* //////////////////////////////////////////
+   FONCTIONS DE TRAITEMENT DES RECETTES
+////////////////////////////////////////// */
 
 // Fonction pour récupérer les données des recettes du fichier recipes.js
 function getData() {
@@ -88,205 +92,65 @@ function updateLastSelectedFilter(filter) {
     lastSelectedFilter = filter;
 }
 
-// Fonction pour gérer la sélection des ingrédients
+/* //////////////////////////////////////////
+   FONCTIONS DE SÉLECTION DES FILTRES
+////////////////////////////////////////// */
+
+// Fonction générique pour gérer la sélection des filtres
+function selectFilter(type, item) {
+    // Détermine la liste sélectionnée et la mise à jour du filtre basé sur le type
+    let selectedList;
+    switch (type) {
+        case 'ingredient':
+            selectedList = selectedIngredients;
+            break;
+        case 'appliance':
+            selectedList = selectedAppliances;
+            break;
+        case 'ustensil':
+            selectedList = selectedUstensils;
+            break;
+        default:
+            console.error('Type de filtre inconnu');
+            return;
+    }
+    
+    const lowerItem = item.toLowerCase();
+    const index = selectedList.indexOf(lowerItem);
+
+    if (index === -1) {
+        selectedList.push(lowerItem);
+        updateLastSelectedFilter(item);
+    } else {
+        selectedList.splice(index, 1);
+        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
+    }
+
+    // Appelle les fonctions communes après la sélection
+    filterAndShowRecipes();
+    updateSelectedItems();
+    adjustGridMargin();
+    closeDropdown();
+}
+
+// Fonction spécifique pour les ingrédients
 function selectIngredient(ingredient) {
-    const index = selectedIngredients.indexOf(ingredient.toLowerCase());
-    if (index === -1) {
-        selectedIngredients.push(ingredient.toLowerCase());
-        updateLastSelectedFilter(ingredient);
-    } else {
-        selectedIngredients.splice(index, 1);
-        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
-    }
-    filterAndShowRecipes();
-    updateSelectedItems();
-    adjustGridMargin();
-    closeDropdown();
+    selectFilter('ingredient', ingredient);
 }
 
-// Fonction pour gérer la sélection des appareils
+// Fonction spécifique pour les appareils
 function selectAppliance(appliance) {
-    const index = selectedAppliances.indexOf(appliance.toLowerCase());
-    if (index === -1) {
-        selectedAppliances.push(appliance.toLowerCase());
-        updateLastSelectedFilter(appliance);
-    } else {
-        selectedAppliances.splice(index, 1);
-        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
-    }
-    filterAndShowRecipes();
-    updateSelectedItems();
-    adjustGridMargin();
-    closeDropdown();
+    selectFilter('appliance', appliance);
 }
 
-// Fonction pour gérer la sélection des ustensiles
+// Fonction spécifique pour les ustensiles
 function selectUstensil(ustensil) {
-    const index = selectedUstensils.indexOf(ustensil.toLowerCase());
-    if (index === -1) {
-        selectedUstensils.push(ustensil.toLowerCase());
-        updateLastSelectedFilter(ustensil);
-    } else {
-        selectedUstensils.splice(index, 1);
-        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
-    }
-    filterAndShowRecipes();
-    updateSelectedItems();
-    adjustGridMargin();
-    closeDropdown();
+    selectFilter('ustensil', ustensil);
 }
 
-// Fonction pour fermer les menus déroulants
-function closeDropdown() {
-    const dropdowns = ['#dropdownIngredientsButton', '#dropdownAppliancesButton', '#dropdownUstensilsButton'];
-    dropdowns.forEach(selector => {
-        const button = document.querySelector(selector);
-        if (button) {
-            button.setAttribute("aria-expanded", "false");
-            button.classList.remove('show');
-            const content = document.querySelector(`${selector.replace('Button', '')} .dropdown-content`);
-            if (content) {
-                content.style.display = 'none';
-            }
-        }
-    });
-}
-
-// Fonction pour ajuster la marge de la grille des cartes recettes 
-function adjustGridMargin() {
-    const grid = document.querySelector('.grid');
-    if (grid) {
-        grid.style.marginTop = '30px';
-    } else {
-        console.log('.grid non trouvé');
-    }
-}
-
-// Fonction pour réinitialiser la marge de la grille des cartes recettes à zéro
-function resetGridMargin() {
-    const grid = document.querySelector('.grid');
-    if (grid) {
-        grid.style.marginTop = '0';
-    } else {
-        console.error('.grid non trouvé');
-    }
-}
-
-// Fonction pour mettre à jour l'affichage des éléments sélectionnés
-function updateSelectedItems() {
-    const optionsContainer = document.querySelector('.options-container') || createOptionsContainer();
-    optionsContainer.innerHTML = '';
-
-    selectedIngredients.forEach(ingredient => {
-        const selectedItem = document.createElement('div');
-        selectedItem.className = 'selected-item';
-        selectedItem.style.display = 'block';
-
-        const textContainer = document.createElement('span');
-        textContainer.className = 'option-text';
-        textContainer.textContent = ingredient;
-        selectedItem.appendChild(textContainer);
-
-        const closeIcon = document.createElement('i');
-        closeIcon.className = 'fa-solid fa-xmark cross-item';
-        closeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-
-        closeIcon.addEventListener('click', () => {
-            selectIngredient(ingredient);
-        });
-
-        selectedItem.appendChild(closeIcon);
-        optionsContainer.appendChild(selectedItem);
-    });
-
-    selectedAppliances.forEach(appliance => {
-        const selectedItem = document.createElement('div');
-        selectedItem.className = 'selected-item';
-        selectedItem.style.display = 'block';
-
-        const textContainer = document.createElement('span');
-        textContainer.className = 'option-text';
-        textContainer.textContent = appliance;
-        selectedItem.appendChild(textContainer);
-
-        const closeIcon = document.createElement('i');
-        closeIcon.className = 'fa-solid fa-xmark cross-item';
-        closeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-
-        closeIcon.addEventListener('click', () => {
-            selectAppliance(appliance);
-        });
-
-        selectedItem.appendChild(closeIcon);
-        optionsContainer.appendChild(selectedItem);
-    });
-
-    selectedUstensils.forEach(ustensil => {
-        const selectedItem = document.createElement('div');
-        selectedItem.className = 'selected-item';
-        selectedItem.style.display = 'block';
-
-        const textContainer = document.createElement('span');
-        textContainer.className = 'option-text';
-        textContainer.textContent = ustensil;
-        selectedItem.appendChild(textContainer);
-
-        const closeIcon = document.createElement('i');
-        closeIcon.className = 'fa-solid fa-xmark cross-item';
-        closeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-
-        closeIcon.addEventListener('click', () => {
-            selectUstensil(ustensil);
-        });
-
-        selectedItem.appendChild(closeIcon);
-        optionsContainer.appendChild(selectedItem);
-    });
-}
-
-// Fonction pour créer le conteneur des éléments sélectionnés
-function createOptionsContainer() {
-    const optionsContainer = document.createElement('div');
-    optionsContainer.className = 'options-container';
-    const flexContainer = document.querySelector('.flex');
-    if (flexContainer) {
-        flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);
-    } else {
-        console.error('.flex non trouvé pour créer le conteneur');
-    }
-    return optionsContainer;
-}
-
-// Fonction d'initialisation principale
-function initialize() {
-    const data = getData();
-    showRecipeCards(data);
-    updateRecipeCounter(null);
-    createFiltersButtons(data, selectIngredient, selectAppliance, selectUstensil);
-}
-
-initialize();
-
-// Fonction pour gérer l'affichage de la croix dans la barre de recherche
-function handleSearchInput() {
-    const searchInput = document.querySelector('.searchbar');
-    const crossIcon = document.querySelector('.cross-icon');
-    if (searchInput && crossIcon) {
-        searchInput.addEventListener('input', () => {
-            crossIcon.classList.toggle('visible', searchInput.value.length > 0);
-        });
-
-        crossIcon.addEventListener('click', () => {
-            searchInput.value = '';
-            crossIcon.classList.remove('visible');
-            searchInput.focus();
-        });
-    } else {
-        console.error('.searchbar ou .cross-icon non trouvé');
-    }
-}
-
-handleSearchInput();
+/* //////////////////////////////////////////
+   FONCTIONS DE MISE À JOUR DES OPTIONS ET SÉLECTIONS
+////////////////////////////////////////// */
 
 // Fonction pour mettre à jour les options des menus déroulants
 function updateDropdownOptions(filteredRecipes) {
@@ -334,6 +198,112 @@ function updateDropdown(id, items, type) {
     }
 }
 
+// Fonction générique pour mettre à jour les éléments sélectionnés
+function updateSelectedItems() {
+    const optionsContainer = document.querySelector('.options-container') || createOptionsContainer();
+    optionsContainer.innerHTML = '';
+
+    // Objet pour mapper les listes sélectionnées aux fonctions de sélection
+    const selectionMap = {
+        ingredients: {
+            list: selectedIngredients,
+            selectFunction: selectIngredient
+        },
+        appliances: {
+            list: selectedAppliances,
+            selectFunction: selectAppliance
+        },
+        ustensils: {
+            list: selectedUstensils,
+            selectFunction: selectUstensil
+        }
+    };
+
+    // Fonction pour créer les éléments sélectionnés
+    function createSelectedItems(type) {
+        const { list, selectFunction } = selectionMap[type];
+
+        list.forEach(item => {
+            const selectedItem = document.createElement('div');
+            selectedItem.className = 'selected-item';
+            selectedItem.style.display = 'block';
+
+            const textContainer = document.createElement('span');
+            textContainer.className = 'option-text';
+            textContainer.textContent = item;
+            selectedItem.appendChild(textContainer);
+
+            const closeIcon = document.createElement('i');
+            closeIcon.className = 'fa-solid fa-xmark cross-item';
+            closeIcon.setAttribute('aria-label', 'Supprimer la sélection');
+
+            closeIcon.addEventListener('click', () => {
+                selectFunction(item);
+            });
+
+            selectedItem.appendChild(closeIcon);
+            optionsContainer.appendChild(selectedItem);
+        });
+    }
+
+    // Appelle la fonction de création pour chaque type
+    createSelectedItems('ingredients');
+    createSelectedItems('appliances');
+    createSelectedItems('ustensils');
+}
+// Fonction pour créer le conteneur des éléments sélectionnés
+function createOptionsContainer() {
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'options-container';
+    const flexContainer = document.querySelector('.flex');
+    if (flexContainer) {
+        flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);
+    } else {
+        console.error('.flex non trouvé pour créer le conteneur');
+    }
+    return optionsContainer;
+}
+
+/* //////////////////////////////////////////
+   FONCTIONS D'UI ET GESTION DES ERREURS
+////////////////////////////////////////// */
+
+// Fonction pour fermer les menus déroulants
+function closeDropdown() {
+    const dropdowns = ['#dropdownIngredientsButton', '#dropdownAppliancesButton', '#dropdownUstensilsButton'];
+    dropdowns.forEach(selector => {
+        const button = document.querySelector(selector);
+        if (button) {
+            button.setAttribute("aria-expanded", "false");
+            button.classList.remove('show');
+            const content = document.querySelector(`${selector.replace('Button', '')} .dropdown-content`);
+            if (content) {
+                content.style.display = 'none';
+            }
+        }
+    });
+}
+
+// Fonction pour ajuster la marge de la grille des cartes recettes 
+function adjustGridMargin() {
+    const grid = document.querySelector('.grid');
+    if (grid) {
+        grid.style.marginTop = '30px';
+    } else {
+        console.log('.grid non trouvé');
+    }
+}
+
+// Fonction pour réinitialiser la marge de la grille des cartes recettes à zéro
+function resetGridMargin() {
+    const grid = document.querySelector('.grid');
+    if (grid) {
+        grid.style.marginTop = '0';
+    } else {
+        console.error('.grid non trouvé');
+    }
+}
+
 // Fonction pour afficher un message d'erreur
 function showError(container, item) {
     // Si le conteneur d'erreurs n'existe pas encore, le créer
@@ -350,12 +320,63 @@ function showError(container, item) {
             return;
         }
     }
+
     // Crée le message d'erreur
     const errorMessage = document.createElement('div');
     errorMessage.className = 'error-message';
-    errorMessage.textContent = `Aucune recette ne contient '${item}'. Veuillez faire une nouvelle recherche, svp.`;
+
+    // Crée le texte principal du message d'erreur
+    const messageText = document.createElement('span');
+    messageText.textContent = "Aucune recette ne contient ";
+    errorMessage.appendChild(messageText);
+
+    // Crée le span pour l'élément avec la classe d'erreur
+    const errorItem = document.createElement('span');
+    errorItem.className = 'error-item';
+    errorItem.textContent = item; // Assure que 'item' est échappé correctement
+    errorMessage.appendChild(errorItem);
+
+    // Ajoute le texte final du message d'erreur
+    const additionalText = document.createElement('span');
+    additionalText.textContent = ". Veuillez faire une nouvelle recherche, svp.";
+    errorMessage.appendChild(additionalText);
 
     // Ajoute le message d'erreur au conteneur
     container.innerHTML = ''; // Vide le conteneur avant d'ajouter un nouveau message
     container.appendChild(errorMessage);
 }
+
+/* //////////////////////////////////////////
+   FONCTIONS D'INITIALISATION
+////////////////////////////////////////// */
+
+// Fonction d'initialisation principale
+function initialize() {
+    const data = getData();
+    showRecipeCards(data);
+    updateRecipeCounter(null);
+    createFiltersButtons(data, selectIngredient, selectAppliance, selectUstensil);
+}
+
+initialize();
+
+// Fonction pour gérer l'affichage de la croix dans la barre de recherche
+function handleSearchInput() {
+    const searchInput = document.querySelector('.searchbar');
+    const crossIcon = document.querySelector('.cross-icon');
+    if (searchInput && crossIcon) {
+        searchInput.addEventListener('input', () => {
+            crossIcon.classList.toggle('visible', searchInput.value.length > 0);
+        });
+
+        crossIcon.addEventListener('click', () => {
+            searchInput.value = '';
+            crossIcon.classList.remove('visible');
+            searchInput.focus();
+        });
+    } else {
+        console.error('.searchbar ou .cross-icon non trouvé');
+    }
+}
+
+handleSearchInput();

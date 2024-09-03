@@ -14,7 +14,7 @@ function createElement(type, attributes = {}, children = []) {
 }
 
 // Fonction pour créer une zone de recherche avec des ID uniques
-export function createSearchArea(listContainer, items, selectCallback) {
+function createSearchArea(listContainer, items, selectCallback) {
     // Crée un conteneur pour la recherche
     const searchContainer = createElement('div', {
         style: 'position: sticky; top: 0; background-color: white; z-index: 1; padding: 10px;'
@@ -149,6 +149,10 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
             const isExpanded = button.getAttribute('aria-expanded') === 'true';
             button.setAttribute('aria-expanded', !isExpanded);
             content.style.display = isExpanded ? 'none' : 'block';
+            
+            // Bascule la rotation de l'icône
+            const icon = button.querySelector('.dropdown-icon');
+            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
         });
 
     } else {
@@ -162,6 +166,7 @@ function createDropdown(id, label, recipes, selectCallback, createSearchFunction
         }
     }
 }
+
 
 
 // Fonction pour créer les boutons de filtre
