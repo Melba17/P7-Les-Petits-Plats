@@ -447,12 +447,9 @@ function handleSearchInput() {
             updateRecipeCounter(recipes.length); // Réinitialise le compteur à toutes les recettes
             showRecipeCards(recipes); // Réaffiche toutes les recettes
             filterAndShowRecipes(); // Réinitialise les filtres
-            resetGridMargin(); // Réinitialise la marge de la galerie des cartes recettes
-
-            
+ 
         });
     }
 }
-
 
 handleSearchInput();
