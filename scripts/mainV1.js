@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
 // Importation des modules
-import { recipes } from './api/recipes.js';
+import { recipes } from './data/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
 import { createFiltersButtons } from './utils/dropdowns.js';
 
@@ -152,9 +152,9 @@ function selectUstensil(ustensil) {
     selectFilter('ustensil', ustensil);
 }
 
-/* //////////////////////////////////////////
+/* ////////////////////////////////////////////////////
    FONCTIONS DE MISE À JOUR DES OPTIONS ET SÉLECTIONS
-////////////////////////////////////////// */
+/////////////////////////////////////////////////// */
 
 // Fonction pour mettre à jour les options des menus déroulants
 function updateDropdownOptions(filteredRecipes) {
@@ -178,7 +178,7 @@ function updateDropdown(id, items, type) {
     const dropdownList = document.querySelector(`#${id} .list-container`);
 
     if (dropdownList) {
-        dropdownList.innerHTML = ''; // On vide la liste des éléments
+        dropdownList.innerHTML = ''; // Vide la liste des éléments
 
         // Remplir la liste d'items
         items.forEach(item => {
@@ -348,7 +348,7 @@ function showError(container, item) {
     // Crée le span pour l'élément avec la classe d'erreur
     const errorItem = document.createElement('span');
     errorItem.className = 'error-item';
-    errorItem.textContent = item; // Assure que 'item' est échappé correctement
+    errorItem.textContent = item; // Ajoute le nom de l'item sélectionné causant le message d'erreur
     errorMessage.appendChild(errorItem);
 
     // Ajoute le texte final du message d'erreur
@@ -362,7 +362,7 @@ function showError(container, item) {
 }
 
 /* //////////////////////////////////////////
-   FONCTIONS D'INITIALISATION
+        FONCTIONS D'INITIALISATION
 ////////////////////////////////////////// */
 
 // Fonction d'initialisation principale
@@ -375,23 +375,84 @@ function initialize() {
 
 initialize();
 
-// Fonction pour gérer l'affichage de la croix dans la barre de recherche
+
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////
+BARRE DE RECHERCHE PRINCIPALE - VERSION N°1 - TRI AVEC BOUCLE FOR ET STRUCTURE CONDITIONNELLE IF/ELSE 
+////////////////////////////////////////////////////////////////////////////////////////////////////// */
+
 function handleSearchInput() {
     const searchInput = document.querySelector('.searchbar');
     const crossIcon = document.querySelector('.cross-icon');
+
+    searchInput.addEventListener('input', function () {
+        const query = searchInput.value.toLowerCase();
+
+        // Si la recherche est trop courte, ne pas effectuer de recherche
+        if (query.length < 3) {
+            // Réinitialise la galerie et le compteur si la recherche est courte
+            showRecipeCards(recipes);
+            updateRecipeCounter(recipes.length);
+            filterAndShowRecipes(); // Réinitialise les filtres si nécessaire
+            return;
+        }
+
+        const filteredRecipes = [];
+
+        for (let i = 0; i < recipes.length; i++) {
+            let recipe = recipes[i];
+            let match = false;
+
+            // Vérifie le titre
+            if (recipe.name.toLowerCase().includes(query)) {
+                match = true;
+            }
+
+            // Vérifie les ingrédients un par un
+            if (!match) {
+                for (let j = 0; j < recipe.ingredients.length; j++) {
+                    if (recipe.ingredients[j].ingredient.toLowerCase().includes(query)) {
+                        match = true;
+                    }
+                }
+            }
+
+            // Vérifie la description
+            if (!match && recipe.description.toLowerCase().includes(query)) {
+                match = true;
+            }
+
+            if (match) {
+                filteredRecipes.push(recipe);
+            }
+        }
+
+        if (filteredRecipes.length > 0) {
+            showRecipeCards(filteredRecipes);  // Affiche les recettes trouvées
+            createFiltersButtons(filteredRecipes, selectIngredient, selectAppliance, selectUstensil); // Met à jour les boutons de filtre
+            updateRecipeCounter(filteredRecipes.length); // Met à jour le compteur de recettes
+
+            
+        } 
+    });
+
+    // Pour gérer la croix de la barre de recherche principale
     if (searchInput && crossIcon) {
         searchInput.addEventListener('input', () => {
-            crossIcon.classList.toggle('visible', searchInput.value.length > 0);
+            crossIcon.classList.toggle('visible', searchInput.value.length > 2);
         });
 
         crossIcon.addEventListener('click', () => {
             searchInput.value = '';
             crossIcon.classList.remove('visible');
-            searchInput.focus();
+            updateRecipeCounter(recipes.length); // Réinitialise le compteur à toutes les recettes
+            showRecipeCards(recipes); // Réaffiche toutes les recettes
+            filterAndShowRecipes(); // Réinitialise les filtres
+            resetGridMargin(); // Réinitialise la marge de la galerie des cartes recettes
+
+            
         });
-    } else {
-        console.error('.searchbar ou .cross-icon non trouvé');
     }
 }
+
 
 handleSearchInput();

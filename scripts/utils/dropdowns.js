@@ -78,7 +78,7 @@ function createDropdown(id, label, items, selectCallback, createSearchFunction) 
         }
     }
 
-    // Mettre à jour l'icône lorsque vous sélectionnez un élément
+    // Met à jour l'icône lorsqu'on sélectionne un élément
     const listContainer = dropdownWrapper.querySelector('.list-container');
     listContainer.addEventListener('click', (event) => {
         if (event.target.classList.contains('item')) {
@@ -153,10 +153,10 @@ function createSearchArea(listContainer, items, selectCallback) {
     // Gestion des événements clavier pour la croix
     clearIcon.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault(); // Empêcher l'action par défaut de l'événement
-            searchInput.value = ''; // Effacer le texte de la recherche
-            clearIcon.style.display = 'none'; // Masquer la croix
-            displayList(listContainer, uniqueItems, selectCallback); // Réafficher la liste complète
+            event.preventDefault(); // Empêche l'action par défaut de l'événement
+            searchInput.value = ''; // Efface le texte de la recherche
+            clearIcon.style.display = 'none'; // Masque la croix
+            displayList(listContainer, uniqueItems, selectCallback); // Réaffiche la liste complète
             searchInput.focus(); // Re-focus sur le champ de recherche
         }
     });
@@ -183,7 +183,7 @@ function displayList(listContainer, items, selectCallback) {
 
 /* //////////////////////////////////////////////////////////////////////////
    FONCTION UTILE POUR CRÉER DES ÉLÉMENTS AVEC DES ATTRIBUTS ET DES ENFANTS /
-   CENTRALISATION DE LA LOGIQUE DE CREATION DES ELEMENTS HTML 
+   CENTRALISATION DE LA LOGIQUE DE CREATION DES ELEMENTS HTML/DOM 
 ///////////////////////////////////////////////////////////////////////// */
 function createElement(type, attributes = {}, children = []) {
     const element = document.createElement(type);

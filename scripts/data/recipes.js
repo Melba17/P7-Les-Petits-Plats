@@ -1062,7 +1062,7 @@ export const recipes = [
         "servings": 4,
         "ingredients": [
             {
-                "ingredient": "Pois Cassé",
+                "ingredient": "Pois Cassés",
                 "quantity": 500,
                 "unit": "grammes"
             },
@@ -1715,7 +1715,7 @@ export const recipes = [
                 "quantity": 2
             },
             {
-                "ingredient": "Kiwis",
+                "ingredient": "Kiwi",
                 "quantity": 3
             },
             {
