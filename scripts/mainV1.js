@@ -13,6 +13,7 @@ let selectedAppliances = [];
 let selectedUstensils = [];
 let lastSelectedFilter = null;
 
+
 /* //////////////////////////////////////////
    FONCTIONS DE TRAITEMENT DES RECETTES
 ////////////////////////////////////////// */
@@ -46,7 +47,7 @@ function updateRecipeCounter(count) {
     }
 }
 
-// Fonction pour filtrer et afficher les recettes
+// Fonction pour filtrer et afficher les recettes initialement
 function filterAndShowRecipes() {
     const data = getData();
     const filteredRecipes = data.filter(recipe =>
@@ -156,7 +157,7 @@ function selectUstensil(ustensil) {
    FONCTIONS DE MISE À JOUR DES OPTIONS ET SÉLECTIONS
 /////////////////////////////////////////////////// */
 
-// Fonction pour mettre à jour les options des menus déroulants
+// Fonction générale, responsable de la coordination de la mise à jour des options des trois listes déroulantes (ingrédients, appareils, ustensiles) en appelant updateDropdown() sur chacune d'elle.
 function updateDropdownOptions(filteredRecipes) {
     const ingredients = new Set();
     const appliances = new Set();
@@ -173,14 +174,14 @@ function updateDropdownOptions(filteredRecipes) {
     updateDropdown('dropdownUstensils', Array.from(ustensils), 'ustensils');
 }
 
-// Fonction pour mettre à jour une liste déroulante spécifique
+// Fonction pour mettre à jour une liste déroulante spécifique avec les données qui lui sont fournies, donc ne gère qu'une seule liste déroulante à la fois
 function updateDropdown(id, items, type) {
     const dropdownList = document.querySelector(`#${id} .list-container`);
 
     if (dropdownList) {
         dropdownList.innerHTML = ''; // Vide la liste des éléments
 
-        // Remplir la liste d'items
+        // Remplit la liste d'items
         items.forEach(item => {
             const itemElement = document.createElement('div');
             itemElement.className = 'item';
@@ -202,7 +203,7 @@ function updateDropdown(id, items, type) {
     }
 }
 
-// Fonction pour afficher les éléments sélectionnés sous les boutons de filtre
+// Fonction pour afficher les éléments sélectionnés sous les boutons de filtre / Tags
 function updateSelectedItems() {
     const optionsContainer = document.querySelector('.options-container') || createOptionsContainer();
     optionsContainer.innerHTML = '';
@@ -389,25 +390,25 @@ function handleSearchInput() {
 
         // Si la recherche est trop courte, ne pas effectuer de recherche
         if (query.length < 3) {
-            // Réinitialise la galerie et le compteur si la recherche est courte
-            showRecipeCards(recipes);
-            updateRecipeCounter(recipes.length);
-            filterAndShowRecipes(); // Réinitialise les filtres si nécessaire
+            showRecipeCards(recipes); // Réinitialise la galerie 
+            updateRecipeCounter(recipes.length); // Réinitialise le compteur 
+            filterAndShowRecipes(); // Réinitialise les filtres 
             return;
         }
 
+        // Prépare un tableau/liste vide au départ dans lequel on pourra stocker les recettes
         const filteredRecipes = [];
 
         for (let i = 0; i < recipes.length; i++) {
             let recipe = recipes[i];
             let match = false;
 
-            // Vérifie le titre
+            // Vérifie le titre de la recette
             if (recipe.name.toLowerCase().includes(query)) {
                 match = true;
             }
 
-            // Vérifie les ingrédients un par un
+            // Vérifie les ingrédients de la recette
             if (!match) {
                 for (let j = 0; j < recipe.ingredients.length; j++) {
                     if (recipe.ingredients[j].ingredient.toLowerCase().includes(query)) {
@@ -416,11 +417,11 @@ function handleSearchInput() {
                 }
             }
 
-            // Vérifie la description
+            // Vérifie la description de la recette
             if (!match && recipe.description.toLowerCase().includes(query)) {
                 match = true;
             }
-
+            // Ajout/stockage de la recette au tableau/liste "filteredRecipes"
             if (match) {
                 filteredRecipes.push(recipe);
             }
@@ -428,9 +429,9 @@ function handleSearchInput() {
 
         if (filteredRecipes.length > 0) {
             showRecipeCards(filteredRecipes);  // Affiche les recettes trouvées
-            createFiltersButtons(filteredRecipes, selectIngredient, selectAppliance, selectUstensil); // Met à jour les boutons de filtre
+            updateDropdownOptions(filteredRecipes) // Met à jour chaque bouton de filtre
             updateRecipeCounter(filteredRecipes.length); // Met à jour le compteur de recettes
-
+            
             
         } 
     });
