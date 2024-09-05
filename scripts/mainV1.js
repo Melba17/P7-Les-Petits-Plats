@@ -14,6 +14,7 @@ let selectedUstensils = [];
 let lastSelectedFilter = null;
 
 
+
 /* //////////////////////////////////////////
    FONCTIONS DE TRAITEMENT DES RECETTES
 ////////////////////////////////////////// */
@@ -47,7 +48,12 @@ function updateRecipeCounter(count) {
     }
 }
 
+
+
 // Fonction pour filtrer et afficher les recettes initialement
+let isGridMarginReset = false; // Variable pour suivre si la grille a été réinitialisée
+let isGridMarginAdjusted = false; // Variable pour suivre si la marge de la grille a été ajustée
+
 function filterAndShowRecipes() {
     const data = getData();
     const filteredRecipes = data.filter(recipe =>
@@ -68,10 +74,26 @@ function filterAndShowRecipes() {
     // Mise à jour du compteur
     if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
         updateRecipeCounter(null); // Réinitialise le compteur à "1500 recettes"
-        resetGridMargin(); // Réinitialise la marge de la grille des cartes recettes à zéro
+        
+        // Réinitialiser la marge de la grille uniquement si elle n'a pas encore été réinitialisée
+        if (!isGridMarginReset) {
+            resetGridMargin(); // Réinitialise la marge de la grille des cartes recettes à zéro
+            isGridMarginReset = true; // Marque la grille comme réinitialisée
+        }
+
+        // Réinitialiser l'ajustement de la marge de la grille
+        if (isGridMarginAdjusted) {
+            adjustGridMargin(); // Ajuste la marge de la grille des cartes recettes
+            isGridMarginAdjusted = false; // Réinitialise la variable pour permettre l'ajustement futur
+        }
     } else {
         updateRecipeCounter(filteredRecipes.length); // Affiche le nombre de cartes recettes disponibles
-        adjustGridMargin();  // Ajuste la marge de la grille des cartes recettes à zéro
+        
+        // Ajuster la marge de la grille uniquement si elle a été réinitialisée
+        if (isGridMarginReset) {
+            adjustGridMargin(); // Ajuste la marge de la grille des cartes recettes
+            isGridMarginAdjusted = true; // Marque la grille comme ajustée
+        }
     }
 
     const optionsContainer = document.querySelector('.options-container');
@@ -91,6 +113,8 @@ function filterAndShowRecipes() {
         }
     }
 }
+
+
 
 // Fonction pour mettre à jour le dernier filtre sélectionné
 function updateLastSelectedFilter(filter) {
