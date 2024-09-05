@@ -256,6 +256,22 @@ input[type="search"]::-webkit-search-cancel-button {
   outline: none;
 }
 
+/** item qui reste sélectionnée dans le menu déroulant **/
+.item.choice-item {
+  background-color: #ffd15b;
+  text-shadow: 0.3px 0.3px 0.1px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.item.choice-item .remove-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+
 /* compteur du nombre de cartes recettes, à droite de l'écran */
 .counter {
   font-family: "Anton", sans-serif;

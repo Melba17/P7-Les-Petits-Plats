@@ -187,19 +187,123 @@ function updateDropdown(id, items, type) {
             itemElement.className = 'item';
             itemElement.tabIndex = '0';
             itemElement.textContent = item;
+
+            // Vérifie si l'élément est déjà sélectionné
+            if (isItemSelected(type, item)) {
+                itemElement.classList.add('choice-item');
+                const removeIcon = document.createElement('i');
+                removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';
+                removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
+                removeIcon.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Empêche la propagation de l'événement de clic
+                    deselectItem(type, item);
+                    updateSelectedItems();
+                    filterAndShowRecipes();
+                });
+                itemElement.appendChild(removeIcon);
+            }
+
             itemElement.addEventListener('click', () => {
-                if (type === 'ingredients') {
-                    selectIngredient(item);
-                } else if (type === 'appliances') {
-                    selectAppliance(item);
-                } else if (type === 'ustensils') {
-                    selectUstensil(item);
+                if (itemElement.classList.contains('choice-item')) {
+                    deselectItem(type, item);
+                    itemElement.classList.remove('choice-item');
+                    const removeIcon = itemElement.querySelector('.remove-icon');
+                    if (removeIcon) {
+                        removeIcon.remove();
+                    }
+                } else {
+                    selectItem(type, item);
+                    itemElement.classList.add('choice-item');
+                    if (!itemElement.querySelector('.remove-icon')) {
+                        const removeIcon = document.createElement('i');
+                        removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';
+                        removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
+                        removeIcon.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Garantit que le clic sur l'icône de suppression n'affecte que l'élément ciblé, évitant ainsi des désélections non désirées sur d'autres éléments en simultané.
+                            deselectItem(type, item);
+                            itemElement.classList.remove('choice-item');
+                            removeIcon.remove();
+                            updateSelectedItems();
+                            filterAndShowRecipes();
+                        });
+                        itemElement.appendChild(removeIcon);
+                    }
                 }
+                filterAndShowRecipes();
+                updateSelectedItems();
             });
+
             dropdownList.appendChild(itemElement);
         });
     } else {
         console.error(`#${id} .list-container non trouvé`);
+    }
+}
+
+// Fonction pour vérifier si un élément est sélectionné
+function isItemSelected(type, item) {
+    let selectedList;
+    switch (type) {
+        case 'ingredients':
+            selectedList = selectedIngredients;
+            break;
+        case 'appliances':
+            selectedList = selectedAppliances;
+            break;
+        case 'ustensils':
+            selectedList = selectedUstensils;
+            break;
+        default:
+            console.error('Type de filtre inconnu');
+            return false;
+    }
+    return selectedList.includes(item.toLowerCase());
+}
+
+// Fonction pour sélectionner un élément
+function selectItem(type, item) {
+    let selectedList;
+    switch (type) {
+        case 'ingredients':
+            selectedList = selectedIngredients;
+            break;
+        case 'appliances':
+            selectedList = selectedAppliances;
+            break;
+        case 'ustensils':
+            selectedList = selectedUstensils;
+            break;
+        default:
+            console.error('Type de filtre inconnu');
+            return;
+    }
+    const lowerItem = item.toLowerCase();
+    if (!selectedList.includes(lowerItem)) {
+        selectedList.push(lowerItem);
+    }
+}
+
+// Fonction pour désélectionner un élément
+function deselectItem(type, item) {
+    let selectedList;
+    switch (type) {
+        case 'ingredients':
+            selectedList = selectedIngredients;
+            break;
+        case 'appliances':
+            selectedList = selectedAppliances;
+            break;
+        case 'ustensils':
+            selectedList = selectedUstensils;
+            break;
+        default:
+            console.error('Type de filtre inconnu');
+            return;
+    }
+    const lowerItem = item.toLowerCase();
+    const index = selectedList.indexOf(lowerItem);
+    if (index !== -1) {
+        selectedList.splice(index, 1);
     }
 }
 
