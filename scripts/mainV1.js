@@ -51,11 +51,12 @@ function updateRecipeCounter(count) {
 
 
 // Fonction pour filtrer et afficher les recettes initialement
+// Variables globales pour suivre la réinitialisation et l'ajustement de la marge de la grille
 let isGridMarginReset = false; // Variable pour suivre si la grille a été réinitialisée
 let isGridMarginAdjusted = false; // Variable pour suivre si la marge de la grille a été ajustée
 
 function filterAndShowRecipes() {
-    const data = getData();
+    const data = getData(); // Récupérer les données des recettes
     const filteredRecipes = data.filter(recipe =>
         selectedIngredients.every(ingredient =>
             recipe.ingredients.some(ing => ing.ingredient.toLowerCase() === ingredient.toLowerCase())
@@ -74,25 +75,25 @@ function filterAndShowRecipes() {
     // Mise à jour du compteur
     if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
         updateRecipeCounter(null); // Réinitialise le compteur à "1500 recettes"
-        
-        // Réinitialiser la marge de la grille uniquement si elle n'a pas encore été réinitialisée
+
+        // Réinitialiser la marge de la grille si elle n'a pas encore été réinitialisée
         if (!isGridMarginReset) {
-            resetGridMargin(); // Réinitialise la marge de la grille des cartes recettes à zéro
+            resetGridMargin(); // Réinitialise la marge de la grille à zéro
             isGridMarginReset = true; // Marque la grille comme réinitialisée
         }
 
-        // Réinitialiser l'ajustement de la marge de la grille
+        // Remettre la variable pour ajustement de la grille à false
         if (isGridMarginAdjusted) {
-            adjustGridMargin(); // Ajuste la marge de la grille des cartes recettes
-            isGridMarginAdjusted = false; // Réinitialise la variable pour permettre l'ajustement futur
+            isGridMarginAdjusted = false; // Réinitialise pour permettre un futur ajustement
         }
     } else {
-        updateRecipeCounter(filteredRecipes.length); // Affiche le nombre de cartes recettes disponibles
-        
-        // Ajuster la marge de la grille uniquement si elle a été réinitialisée
-        if (isGridMarginReset) {
-            adjustGridMargin(); // Ajuste la marge de la grille des cartes recettes
+        updateRecipeCounter(filteredRecipes.length); // Affiche le nombre de recettes filtrées
+
+        // Ajuster la marge de la grille dès qu'il y a des filtres appliqués ou après une recherche
+        if (!isGridMarginAdjusted || isGridMarginReset) {
+            adjustGridMargin(); // Ajuste la marge de la grille
             isGridMarginAdjusted = true; // Marque la grille comme ajustée
+            isGridMarginReset = false; // Réinitialisation terminée
         }
     }
 
@@ -102,18 +103,17 @@ function filterAndShowRecipes() {
     if (filteredRecipes.length === 0) {
         if (optionsContainer) {
             if (lastSelectedFilter) {
-                // Crée ou met à jour la zone de message d'erreur
+                // Affiche un message d'erreur si aucun résultat trouvé
                 showError(errorContainer, lastSelectedFilter);
             }
         }
     } else {
-        // Supprime le conteneur du message d'erreur existant s'il y en a un
+        // Supprime l'erreur s'il y a des résultats
         if (errorContainer) {
             errorContainer.remove();
         }
     }
 }
-
 
 
 // Fonction pour mettre à jour le dernier filtre sélectionné
@@ -500,6 +500,7 @@ function initialize() {
     showRecipeCards(data);
     updateRecipeCounter(null);
     createFiltersButtons(data, selectIngredient, selectAppliance, selectUstensil);
+    
 }
 
 initialize();
