@@ -56,7 +56,7 @@ let isGridMarginReset = false; // Variable pour suivre si la grille a été réi
 let isGridMarginAdjusted = false; // Variable pour suivre si la marge de la grille a été ajustée
 
 function filterAndShowRecipes() {
-    const data = getData(); // Récupérer les données des recettes
+    const data = mainSearchResults !== null ? mainSearchResults : recipes; // Utilise les résultats de la recherche principale si disponibles
     const filteredRecipes = data.filter(recipe =>
         selectedIngredients.every(ingredient =>
             recipe.ingredients.some(ing => ing.ingredient.toLowerCase() === ingredient.toLowerCase())
@@ -74,7 +74,11 @@ function filterAndShowRecipes() {
 
     // Mise à jour du compteur
     if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
-        updateRecipeCounter(null); // Réinitialise le compteur à "1500 recettes"
+        if (mainSearchResults === null) {
+            updateRecipeCounter(null); // Réinitialise à 1500 si aucune recherche effectuée
+        } else {
+            updateRecipeCounter(mainSearchResults.length); // Affiche le nombre de recettes de la recherche principale
+        }
 
         // Réinitialiser la marge de la grille si elle n'a pas encore été réinitialisée
         if (!isGridMarginReset) {
@@ -101,17 +105,11 @@ function filterAndShowRecipes() {
     const errorContainer = document.querySelector('.error-container');
 
     if (filteredRecipes.length === 0) {
-        if (optionsContainer) {
-            if (lastSelectedFilter) {
-                // Affiche un message d'erreur si aucun résultat trouvé
-                showError(errorContainer, lastSelectedFilter);
-            }
+        if (optionsContainer && lastSelectedFilter) {
+            showError(errorContainer, lastSelectedFilter);
         }
-    } else {
-        // Supprime l'erreur s'il y a des résultats
-        if (errorContainer) {
-            errorContainer.remove();
-        }
+    } else if (errorContainer) {
+        errorContainer.remove();
     }
 }
 
@@ -510,6 +508,9 @@ initialize();
 BARRE DE RECHERCHE PRINCIPALE - VERSION N°1 - TRI AVEC BOUCLE FOR ET STRUCTURE CONDITIONNELLE IF/ELSE 
 ////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
+// Variable pour stocker les résultats de la recherche principale
+let mainSearchResults = null;
+
 function handleSearchInput() {
     const searchInput = document.querySelector('.searchbar');
     const crossIcon = document.querySelector('.cross-icon');
@@ -517,10 +518,11 @@ function handleSearchInput() {
     searchInput.addEventListener('input', function () {
         const query = searchInput.value.toLowerCase();
 
-        // Si la recherche est trop courte, ne pas effectuer de recherche
+        // Si la recherche est trop courte, réinitialise
         if (query.length < 3) {
+            mainSearchResults = null; // Réinitialise les résultats de la recherche principale
             showRecipeCards(recipes); // Réinitialise la galerie 
-            updateRecipeCounter(recipes.length); // Réinitialise le compteur 
+            updateRecipeCounter(1500); // Réinitialise le compteur 
             filterAndShowRecipes(); // Réinitialise les filtres 
             return;
         }
@@ -542,6 +544,7 @@ function handleSearchInput() {
                 for (let j = 0; j < recipe.ingredients.length; j++) {
                     if (recipe.ingredients[j].ingredient.toLowerCase().includes(query)) {
                         match = true;
+                        break; // Pas besoin de vérifier plus d'ingrédients si c'est déjà un match
                     }
                 }
             }
@@ -557,6 +560,7 @@ function handleSearchInput() {
         }
 
         if (filteredRecipes.length > 0) {
+            mainSearchResults = filteredRecipes; // Stocke le résultat de la recherche principale
             showRecipeCards(filteredRecipes);  // Affiche les recettes trouvées
             updateDropdownOptions(filteredRecipes) // Met à jour chaque bouton de filtre
             updateRecipeCounter(filteredRecipes.length); // Met à jour le compteur de recettes
@@ -574,7 +578,8 @@ function handleSearchInput() {
         crossIcon.addEventListener('click', () => {
             searchInput.value = '';
             crossIcon.classList.remove('visible');
-            updateRecipeCounter(recipes.length); // Réinitialise le compteur à toutes les recettes
+            mainSearchResults = null; // Réinitialise les résultats de recherche
+            updateRecipeCounter(1500); // Réinitialise le compteur à toutes les recettes
             showRecipeCards(recipes); // Réaffiche toutes les recettes
             filterAndShowRecipes(); // Réinitialise les filtres
  
