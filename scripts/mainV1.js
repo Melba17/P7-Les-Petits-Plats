@@ -13,8 +13,6 @@ let selectedAppliances = [];
 let selectedUstensils = [];
 let lastSelectedFilter = null;
 
-
-
 /* //////////////////////////////////////////
    FONCTIONS DE TRAITEMENT DES RECETTES
 ////////////////////////////////////////// */
@@ -47,8 +45,6 @@ function updateRecipeCounter(count) {
         console.error('.counter non trouvé');
     }
 }
-
-
 
 // Fonction pour filtrer et afficher les recettes initialement
 // Variables globales pour suivre la réinitialisation et l'ajustement de la marge de la grille
@@ -112,7 +108,6 @@ function filterAndShowRecipes() {
         errorContainer.remove();
     }
 }
-
 
 // Fonction pour mettre à jour le dernier filtre sélectionné
 function updateLastSelectedFilter(filter) {
@@ -392,7 +387,6 @@ function updateSelectedItems() {
     createSelectedItems('ustensils');
 }
 
-
 // Fonction pour créer le conteneur des éléments sélectionnés
 function createOptionsContainer() {
     const optionsContainer = document.createElement('div');
@@ -503,7 +497,6 @@ function initialize() {
 
 initialize();
 
-
 /* //////////////////////////////////////////////////////////////////////////////////////////////////////
 BARRE DE RECHERCHE PRINCIPALE - VERSION N°1 - TRI AVEC BOUCLE FOR ET STRUCTURE CONDITIONNELLE IF/ELSE 
 ////////////////////////////////////////////////////////////////////////////////////////////////////// */
@@ -516,57 +509,77 @@ function handleSearchInput() {
     const crossIcon = document.querySelector('.cross-icon');
 
     searchInput.addEventListener('input', function () {
-        const query = searchInput.value.toLowerCase();
+        const query = searchInput.value.toLowerCase().trim();
 
         // Si la recherche est trop courte, réinitialise
         if (query.length < 3) {
-            mainSearchResults = null; // Réinitialise les résultats de la recherche principale
-            showRecipeCards(recipes); // Réinitialise la galerie 
-            updateRecipeCounter(1500); // Réinitialise le compteur 
-            filterAndShowRecipes(); // Réinitialise les filtres 
+            mainSearchResults = null;
+            showRecipeCards(recipes);
+            updateRecipeCounter(1500);
+            filterAndShowRecipes();
             return;
         }
 
-        // Prépare un tableau/liste vide au départ dans lequel on pourra stocker les recettes
-        const filteredRecipes = [];
+        // Extraire les termes de recherche avec des termes composés
+        const terms = extractSearchTerms(query);
 
+        // Filtrer les recettes
+        const filteredRecipes = [];
         for (let i = 0; i < recipes.length; i++) {
             let recipe = recipes[i];
-            let match = false;
+            let recipeMatches = true;
 
-            // Vérifie le titre de la recette
-            if (recipe.name.toLowerCase().includes(query)) {
-                match = true;
-            }
+            // Vérifier que tous les termes sont présents dans le titre, les ingrédients ou la description
+            for (let j = 0; j < terms.length; j++) {
+                let term = terms[j];
+                let termPatterns = [
+                    new RegExp(`\\b${term}\\b`, 'i'), // Terme exact
+                    new RegExp(`\\b${pluralize(term)}\\b`, 'i') // Pluriel
+                ];
+                let termFound = false;
 
-            // Vérifie les ingrédients de la recette
-            if (!match) {
-                for (let j = 0; j < recipe.ingredients.length; j++) {
-                    if (recipe.ingredients[j].ingredient.toLowerCase().includes(query)) {
-                        match = true;
-                        break; // Pas besoin de vérifier plus d'ingrédients si c'est déjà un match
+                // Vérifier le titre de la recette
+                if (termPatterns.some(pattern => pattern.test(recipe.name))) {
+                    termFound = true;
+                }
+
+                // Vérifier les ingrédients de la recette
+                for (let k = 0; k < recipe.ingredients.length; k++) {
+                    if (termPatterns.some(pattern => pattern.test(recipe.ingredients[k].ingredient))) {
+                        termFound = true;
+                        break;
                     }
+                }
+
+                // Vérifier la description de la recette
+                if (termPatterns.some(pattern => pattern.test(recipe.description))) {
+                    termFound = true;
+                }
+
+                // Si un terme n'est pas trouvé, la recette ne correspond pas
+                if (!termFound) {
+                    recipeMatches = false;
+                    break;
                 }
             }
 
-            // Vérifie la description de la recette
-            if (!match && recipe.description.toLowerCase().includes(query)) {
-                match = true;
-            }
-            // Ajout/stockage de la recette au tableau/liste "filteredRecipes"
-            if (match) {
+            // Ajouter la recette aux résultats filtrés si elle correspond
+            if (recipeMatches) {
                 filteredRecipes.push(recipe);
             }
         }
 
         if (filteredRecipes.length > 0) {
-            mainSearchResults = filteredRecipes; // Stocke le résultat de la recherche principale
-            showRecipeCards(filteredRecipes);  // Affiche les recettes trouvées
-            updateDropdownOptions(filteredRecipes) // Met à jour chaque bouton de filtre
-            updateRecipeCounter(filteredRecipes.length); // Met à jour le compteur de recettes
-            
-            
-        } 
+            mainSearchResults = filteredRecipes;
+            showRecipeCards(filteredRecipes);
+            updateDropdownOptions(filteredRecipes);
+            updateRecipeCounter(filteredRecipes.length);
+        } else {
+            mainSearchResults = [];
+            showRecipeCards([]);
+            updateDropdownOptions([]);
+            updateRecipeCounter(0);
+        }
     });
 
     // Pour gérer la croix de la barre de recherche principale
@@ -578,13 +591,52 @@ function handleSearchInput() {
         crossIcon.addEventListener('click', () => {
             searchInput.value = '';
             crossIcon.classList.remove('visible');
-            mainSearchResults = null; // Réinitialise les résultats de recherche
-            updateRecipeCounter(1500); // Réinitialise le compteur à toutes les recettes
-            showRecipeCards(recipes); // Réaffiche toutes les recettes
-            filterAndShowRecipes(); // Réinitialise les filtres
- 
+            mainSearchResults = null;
+            updateRecipeCounter(1500);
+            showRecipeCards(recipes);
+            filterAndShowRecipes();
         });
     }
+}
+
+function extractSearchTerms(query) {
+    // Diviser la recherche en termes en tenant compte des termes composés
+    const terms = [];
+    let currentTerm = '';  
+    let insideQuotes = false;
+
+    for (let i = 0; i < query.length; i++) {
+        const char = query[i];
+        
+        if (char === '"') {
+            insideQuotes = !insideQuotes; // Activer/désactiver la détection des guillemets
+            if (!insideQuotes && currentTerm) {
+                terms.push(currentTerm.trim());
+                currentTerm = '';
+            }
+        } else if (char === ' ' && !insideQuotes) {
+            if (currentTerm) {
+                terms.push(currentTerm.trim());
+                currentTerm = '';
+            }
+        } else {
+            currentTerm += char;
+        }
+    }
+
+    if (currentTerm) {
+        terms.push(currentTerm.trim());
+    }
+
+    return terms;
+}
+
+function pluralize(term) {
+    // Simple pluralisation: ajoute un "s" à la fin du terme si ce n'est pas déjà pluriel
+    if (term.endsWith('s') || term.endsWith('x') || term.endsWith('z')) {
+        return term; // Termes déjà pluriels
+    }
+    return term + 's'; // Ajoute un "s" pour la pluralisation
 }
 
 handleSearchInput();
