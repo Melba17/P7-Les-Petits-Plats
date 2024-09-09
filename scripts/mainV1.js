@@ -46,9 +46,6 @@ function updateRecipeCounter(count) {
     }
 }
 
-// Fonction pour filtrer et afficher les recettes initialement
-// Variables globales pour suivre la réinitialisation et l'ajustement de la marge de la grille
-let isGridMarginReset = false; // Variable pour suivre si la grille a été réinitialisée
 let isGridMarginAdjusted = false; // Variable pour suivre si la marge de la grille a été ajustée
 
 function filterAndShowRecipes() {
@@ -70,71 +67,64 @@ function filterAndShowRecipes() {
 
     // Mise à jour du compteur
     if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
-        if (mainSearchResults === null) {
-            updateRecipeCounter(null); // Réinitialise à 1500 si aucune recherche effectuée
+        if (mainSearchResults === null || mainSearchResults.length === 0) {
+            updateRecipeCounter(1500); // Réinitialise à 1500 si aucune recherche effectuée ou si les résultats de recherche sont vides
         } else {
             updateRecipeCounter(mainSearchResults.length); // Affiche le nombre de recettes de la recherche principale
         }
 
-        // Réinitialiser la marge de la grille si elle n'a pas encore été réinitialisée
-        if (!isGridMarginReset) {
-            resetGridMargin(); // Réinitialise la marge de la grille à zéro
-            isGridMarginReset = true; // Marque la grille comme réinitialisée
-        }
-
-        // Remettre la variable pour ajustement de la grille à false
-        if (isGridMarginAdjusted) {
-            isGridMarginAdjusted = false; // Réinitialise pour permettre un futur ajustement
+        // Réinitialise la marge de la grille si elle n'a pas encore été réinitialisée
+        if (filteredRecipes.length === 0) {
+            if (!isGridMarginAdjusted) {
+                adjustGridMargin(); // Ajuste la marge de la grille à 30px
+                isGridMarginAdjusted = true; // Marque la grille comme ajustée
+            }
         }
     } else {
         updateRecipeCounter(filteredRecipes.length); // Affiche le nombre de recettes filtrées
 
-        // Ajuster la marge de la grille dès qu'il y a des filtres appliqués ou après une recherche
-        if (!isGridMarginAdjusted || isGridMarginReset) {
-            adjustGridMargin(); // Ajuste la marge de la grille
-            isGridMarginAdjusted = true; // Marque la grille comme ajustée
-            isGridMarginReset = false; // Réinitialisation terminée
+        // Ajuste la marge de la grille seulement si elle n'a pas déjà été ajustée ou si la grille a été réinitialisée
+        if (selectedIngredients.length > 0 || selectedAppliances.length > 0 || selectedUstensils.length > 0) {
+            if (!isGridMarginAdjusted) {
+                adjustGridMargin(); // Ajuste la marge de la grille
+                isGridMarginAdjusted = true; // Marque la grille comme ajustée
+            }
         }
     }
 
     const optionsContainer = document.querySelector('.options-container');
     const errorContainer = document.querySelector('.error-container');
 
-    if (filteredRecipes.length === 0) {
-        if (optionsContainer && lastSelectedFilter) {
-            showError(errorContainer, lastSelectedFilter);
-        }
+    if (filteredRecipes.length === 0 && optionsContainer && lastSelectedFilter) {
+        showError(errorContainer, lastSelectedFilter);
     } else if (errorContainer) {
         errorContainer.remove();
     }
-}
-
-// Fonction pour mettre à jour le dernier filtre sélectionné
-function updateLastSelectedFilter(filter) {
-    lastSelectedFilter = filter;
 }
 
 /* //////////////////////////////////////////
    FONCTIONS DE SÉLECTION DES FILTRES
 ////////////////////////////////////////// */
 
+// Objet pour les listes de filtres
+const filterLists = {
+    'ingredient': selectedIngredients,
+    'appliance': selectedAppliances,
+    'ustensil': selectedUstensils
+};
+
+// Met à jour le dernier filtre sélectionné
+function updateLastSelectedFilter(filter) {
+    lastSelectedFilter = filter;
+}
+
 // Fonction générique pour gérer la sélection des filtres
 function selectFilter(type, item) {
-    // Détermine la liste sélectionnée et la mise à jour du filtre basé sur le type
-    let selectedList;
-    switch (type) {
-        case 'ingredient':
-            selectedList = selectedIngredients;
-            break;
-        case 'appliance':
-            selectedList = selectedAppliances;
-            break;
-        case 'ustensil':
-            selectedList = selectedUstensils;
-            break;
-        default:
-            console.error('Type de filtre inconnu');
-            return;
+    const selectedList = filterLists[type];
+    
+    if (!selectedList) {
+        console.error('Type de filtre inconnu');
+        return;
     }
     
     const lowerItem = item.toLowerCase();
@@ -145,7 +135,7 @@ function selectFilter(type, item) {
         updateLastSelectedFilter(item);
     } else {
         selectedList.splice(index, 1);
-        updateLastSelectedFilter(null); // Réinitialise si aucun filtre n'est sélectionné
+        updateLastSelectedFilter(selectedList.length > 0 ? selectedList[selectedList.length - 1] : null);
     }
 
     // Appelle les fonctions communes après la sélection
@@ -155,19 +145,22 @@ function selectFilter(type, item) {
     closeDropdown();
 }
 
-// Fonction spécifique pour les ingrédients
+// Fonction générique pour sélectionner un filtre
+function select(type, value) {
+    selectFilter(type, value);
+}
+
+// Utilisation des fonctions spécifiques
 function selectIngredient(ingredient) {
-    selectFilter('ingredient', ingredient);
+    select('ingredient', ingredient);
 }
 
-// Fonction spécifique pour les appareils
 function selectAppliance(appliance) {
-    selectFilter('appliance', appliance);
+    select('appliance', appliance);
 }
 
-// Fonction spécifique pour les ustensiles
 function selectUstensil(ustensil) {
-    selectFilter('ustensil', ustensil);
+    select('ustensil', ustensil);
 }
 
 /* ////////////////////////////////////////////////////
@@ -442,16 +435,6 @@ function adjustGridMargin() {
     }
 }
 
-// Fonction pour réinitialiser la marge de la grille des cartes recettes à zéro
-function resetGridMargin() {
-    const grid = document.querySelector('.grid');
-    if (grid) {
-        grid.style.marginTop = '0';
-    } else {
-        console.error('.grid non trouvé');
-    }
-}
-
 // Fonction pour afficher un message d'erreur
 function showError(container, item) {
     // Si le conteneur d'erreurs n'existe pas encore, le créer
@@ -490,7 +473,6 @@ function showError(container, item) {
     container.innerHTML = ''; // Vide le conteneur avant d'ajouter un nouveau message
     container.appendChild(errorMessage);
 }
-
 
 /* //////////////////////////////////////////
         FONCTIONS D'INITIALISATION
@@ -647,7 +629,6 @@ function getSingularAndPluralForms(term) {
         };
     }
 }
-
 
 function extractSearchTerms(query) {
     // Diviser la recherche en termes en tenant compte des termes composés
