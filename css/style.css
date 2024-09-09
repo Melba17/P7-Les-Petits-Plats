@@ -61,6 +61,8 @@ h1 {
   cursor: pointer;
 }
 
+
+
 /* Conteneur de l'icône de recherche */
 .glass {
   position: absolute;
@@ -146,6 +148,7 @@ h1 {
   font-size: 16px;
   width: 190px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 /** Flèche **/
@@ -197,8 +200,8 @@ h1 {
   border-color: #c6c6c6;
   font-size: 14px;
   cursor: pointer;
-  margin-bottom: 10px;
-  margin-left: 18px;
+  margin-bottom: 7px;
+  margin-left: 6px;
 }
 
 /* Loupe */
@@ -208,20 +211,21 @@ h1 {
   width: 14px;
   height: 14px;
   color: #c6c6c6;
-  top: 52%;
+  top: 45%;
   transform: translateY(-50%); /* Ajuste le centrage vertical */
-  right: 25px;
+  right: 28px;
 }
 
 /* Croix */
 .clear-icon {
+  display: none;
   position: absolute;
-  right: 40px; 
+  right: 45px; 
   cursor: pointer;
   color: #c6c6c6;
   width: 16px;
   height: 16px;
-  top: 54%;
+  top: 47%;
   transform: translateY(-50%);
   background-color: white;
 }
@@ -229,7 +233,10 @@ h1 {
 .clear-icon:hover {
   color: black;
 }
-
+.clear-icon:focus-visible {
+  color: black; 
+  outline-offset: 1px;  
+}
 /* Supprime la croix par défaut du navigateur dans les champs de type search */
 input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
@@ -238,7 +245,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 /* positionnement des item dans le menu déroulant */
 .item {
-  padding: 1.2px 18px;
+  padding: 1px 18px;
 }
 
 .item:hover,
@@ -248,6 +255,22 @@ input[type="search"]::-webkit-search-cancel-button {
   text-shadow: 0.3px 0.3px 0.1px rgba(0, 0, 0, 0.6);
   outline: none;
 }
+
+/** item qui reste sélectionnée dans le menu déroulant **/
+.item.choice-item {
+  background-color: #ffd15b;
+  text-shadow: 0.3px 0.3px 0.1px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.item.choice-item .remove-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
 
 /* compteur du nombre de cartes recettes, à droite de l'écran */
 .counter {
@@ -277,13 +300,30 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .cross-item {
   position: absolute;
-  right: 6px; 
+  right: 0; 
   cursor: pointer;
   color: black;
   width: 20px;
   height: 20px;
   top: 57%;
   transform: translateY(-50%);
+}
+
+/*** Conteneur pour les options sélectionnées ***/
+.options-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  margin-top: -25px;
+  width: auto;
+  flex-wrap: wrap; 
+}
+
+.options-container .selected-item {
+  margin-left: 90px;
+  margin-right: -35px; 
+  padding: 15px 7px; 
 }
 
 .error-message {
@@ -300,23 +340,19 @@ input[type="search"]::-webkit-search-cancel-button {
   width: 1230px;
 }
 
-
-/*** Conteneur pour les options sélectionnées ***/
-.options-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 15px;
-  margin-top: -25px;
-  width: auto;
-  flex-wrap: wrap; 
+.error-container {
+  padding: 10px;
+  color: black;
+  margin-left: 80px;
+  margin-top: -180px;
+  margin-bottom: 40px;
 }
 
-.options-container .selected-item {
-  margin-left: 90px;
-  margin-right: -35px; 
-  padding: 15px 12px; 
+.error-item {
+  color: blue;
+  font-weight: bold; 
 }
+
 
 /***** CARTES RECETTES *****/
 /*** Ajuste la marge pour tenir compte de l'option sélectionnée ***/

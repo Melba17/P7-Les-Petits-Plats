@@ -948,8 +948,8 @@ export const recipes = [
             }
         ],
         "time": 25,
-        "description":"Verser de l'huile dans une cocotte minute couper les légumes et les verser dans l'huile chaude. Laisser cuire et remuer pendant 10 minutes. Passer aux mixer. Servir.",
-        "appliance": "Mixer",
+        "description":"Verser de l'huile dans une cocotte minute couper les légumes et les verser dans l'huile chaude. Laisser cuire et remuer pendant 10 minutes. Passer aux mixeur. Servir.",
+        "appliance": "Mixeur",
         "ustensils":["cocotte minute", "couteau"]
     },
     {
@@ -1020,7 +1020,7 @@ export const recipes = [
         ],
         "time": 80,
         "description":"Émincer les blanc de poireaux et les faire chauffer dans 25 grammes de beurre. AJouter les pommes de terres coupées en morceaux. Ajouter l'eau et laisser mijoter pour 45 minutes. Chauffer l'oseille avec le beurre restant puis incorporer le tout. Mixez. Ajoutez la crème. Bon appetit.",
-        "appliance": "Mixer",
+        "appliance": "Mixeur",
         "ustensils":["casserole","couteau"]
     },
     {
@@ -1051,8 +1051,8 @@ export const recipes = [
             }
         ],
         "time": 30,
-        "description":"Prendre les pois chiches, les mettre dans le mixer avec de l'huile d'olive, ajouter le jus des 2 citrons et du paprika selon le gout.",
-        "appliance": "Mixer",
+        "description":"Prendre les pois chiches, les mettre dans le mixeur avec de l'huile d'olive, ajouter le jus des 2 citrons et du paprika selon le gout.",
+        "appliance": "Mixeur",
         "ustensils":["cuillère en bois", "presse citron"]
     },
     {
@@ -1062,7 +1062,7 @@ export const recipes = [
         "servings": 4,
         "ingredients": [
             {
-                "ingredient": "Pois Cassé",
+                "ingredient": "Pois Cassés",
                 "quantity": 500,
                 "unit": "grammes"
             },
@@ -1077,8 +1077,8 @@ export const recipes = [
             }
         ],
         "time": 60,
-        "description":"Mettre tous les ingrédients dans une cocotte. ajouter de l'eau pour recouvrir l'ensemble et laisser cuire à petit feu pour 1 heure. Passer au mixer. Salez, poivrez. C'est prêt",
-        "appliance": "Mixer",
+        "description":"Mettre tous les ingrédients dans une cocotte. ajouter de l'eau pour recouvrir l'ensemble et laisser cuire à petit feu pour 1 heure. Passer au mixeur. Salez, poivrez. C'est prêt",
+        "appliance": "Mixeur",
         "ustensils":["casserole", "cuillère en bois"]
     },
     {
@@ -1112,7 +1112,7 @@ export const recipes = [
             }
         ],
         "time": 60,
-        "description":"Découper en cubes les carottes et pommes de terre. Faire revenir dans du beurre. Ajouter les lardons, une fois les lardons dorés, ajouter un grand verre d'eau. Ajouter les petit poids et les haricots verts ( tous deux pré cuits ). Ajouter Sel, poivre, thyms et laurier",
+        "description":"Découper en cubes les carottes et pommes de terre. Faire revenir dans du beurre. Ajouter les lardons, une fois les lardons dorés, ajouter un grand verre d'eau. Ajouter les petits pois et les haricots verts ( tous deux pré cuits ). Ajouter Sel, poivre, thyms et laurier",
         "appliance": "Poêle",
         "ustensils":["Couteau", "économe"]
     },
@@ -1219,8 +1219,8 @@ export const recipes = [
             }
         ],
         "time": 25,
-        "description":"Éplucher les patates douces et coupez les en morceaux. Les faire cuire durant 20 minute dans une casserole d'eau bouillante. Passer au mixer en ajoutant la crème et l'huile d'olive à son gout. Salez, poivrez. Pressez l'orange et ajouter le jus à l'ensemble. Servir.",
-        "appliance": "Mixer",
+        "description":"Éplucher les patates douces et coupez les en morceaux. Les faire cuire durant 20 minute dans une casserole d'eau bouillante. Passer au mixeur en ajoutant la crème et l'huile d'olive à son gout. Salez, poivrez. Pressez l'orange et ajouter le jus à l'ensemble. Servir.",
+        "appliance": "Mixeur",
         "ustensils":["couteau", "économe", "cuillère en bois"]
     },
     {
@@ -1260,7 +1260,7 @@ export const recipes = [
         ],
         "time": 25,
         "description":"Éplucher les légumes, les couper en morceaux et les mettre à cuire dans une cocotte minute environ 15 minutes. Mixer en ajoutant le beurre, la crème. Ajouter le cumin et la noix de muscade.",
-        "appliance": "Mixer",
+        "appliance": "Mixeur",
         "ustensils":["cocotte minute", "couteau", "cuillère en bois"]
     },
     {
@@ -1715,7 +1715,7 @@ export const recipes = [
                 "quantity": 2
             },
             {
-                "ingredient": "Kiwis",
+                "ingredient": "Kiwi",
                 "quantity": 3
             },
             {
