@@ -213,41 +213,13 @@ function updateDropdown(id, items, type) {
                 removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
                 removeIcon.addEventListener('click', (e) => {
                     e.stopPropagation(); // Empêche la propagation de l'événement de clic
-                    deselectItem(type, item);
-                    updateSelectedItems();
-                    filterAndShowRecipes();
+                    handleItemDeselect(type, item, itemElement);
                 });
                 itemElement.appendChild(removeIcon);
             }
 
             itemElement.addEventListener('click', () => {
-                if (itemElement.classList.contains('choice-item')) {
-                    deselectItem(type, item);
-                    itemElement.classList.remove('choice-item');
-                    const removeIcon = itemElement.querySelector('.remove-icon');
-                    if (removeIcon) {
-                        removeIcon.remove();
-                    }
-                } else {
-                    selectItem(type, item);
-                    itemElement.classList.add('choice-item');
-                    if (!itemElement.querySelector('.remove-icon')) {
-                        const removeIcon = document.createElement('i');
-                        removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';
-                        removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-                        removeIcon.addEventListener('click', (e) => {
-                            e.stopPropagation(); // Garantit que le clic sur l'icône de suppression n'affecte que l'élément ciblé, évitant ainsi des désélections non désirées sur d'autres éléments en simultané.
-                            deselectItem(type, item);
-                            itemElement.classList.remove('choice-item');
-                            removeIcon.remove();
-                            updateSelectedItems();
-                            filterAndShowRecipes();
-                        });
-                        itemElement.appendChild(removeIcon);
-                    }
-                }
-                filterAndShowRecipes();
-                updateSelectedItems();
+                handleItemSelectOrDeselect(type, item, itemElement);
             });
 
             dropdownList.appendChild(itemElement);
@@ -256,6 +228,46 @@ function updateDropdown(id, items, type) {
         console.error(`#${id} .list-container non trouvé`);
     }
 }
+
+// Fonction pour gérer la sélection ou désélection d'un item
+function handleItemSelectOrDeselect(type, item, itemElement) {
+    if (itemElement.classList.contains('choice-item')) {
+        handleItemDeselect(type, item, itemElement);
+    } else {
+        selectItem(type, item);
+        itemElement.classList.add('choice-item');
+        addRemoveIcon(itemElement, type, item);
+    }
+
+    updateSelectedItems();
+    filterAndShowRecipes();
+}
+
+// Fonction pour désélectionner un item
+function handleItemDeselect(type, item, itemElement) {
+    deselectItem(type, item);
+    itemElement.classList.remove('choice-item');
+    const removeIcon = itemElement.querySelector('.remove-icon');
+    if (removeIcon) {
+        removeIcon.remove();
+    }
+
+    updateSelectedItems();
+    filterAndShowRecipes();
+}
+
+// Fonction pour ajouter l'icône de suppression (pour ne pas répéter le code)
+function addRemoveIcon(itemElement, type, item) {
+    const removeIcon = document.createElement('i');
+    removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';
+    removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
+    removeIcon.addEventListener('click', (e) => {
+        e.stopPropagation(); // Garantit que le clic sur l'icône de suppression n'affecte pas d'autres éléments
+        handleItemDeselect(type, item, itemElement);
+    });
+    itemElement.appendChild(removeIcon);
+}
+
 
 // Fonction pour vérifier si un élément est sélectionné
 function isItemSelected(type, item) {
@@ -502,7 +514,7 @@ BARRE DE RECHERCHE PRINCIPALE - VERSION N°1 - TRI AVEC BOUCLE FOR ET STRUCTURE 
 // Variable pour stocker les résultats de la recherche principale
 let mainSearchResults = null;
 let typingTimer; // Timer pour gérer le délai de recherche
-const typingInterval = 500; // Délai en millisecondes avant d'afficher le message d'erreur
+const typingInterval = 500;
 
 function handleSearchInput() {
     const searchInput = document.querySelector('.searchbar');
@@ -538,27 +550,29 @@ function handleSearchInput() {
                 let recipe = recipes[i];
                 let recipeMatches = true;
 
-                // Vérifier que tous les termes sont présents dans le titre, les ingrédients ou la description
+                // Vérifier que tous les termes (singulier/pluriel) sont présents dans le titre, les ingrédients ou la description
                 for (let j = 0; j < terms.length; j++) {
                     let term = terms[j];
-                    let termPattern = new RegExp(`\\b${term}\\b`, 'i'); // Expression régulière pour correspondre au terme exact
+                    let { singular, plural } = getSingularAndPluralForms(term); // Obtenir les deux formes du terme
+                    let termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i'); // Expression régulière pour le singulier
+                    let termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i'); // Expression régulière pour le pluriel
                     let termFound = false;
 
                     // Vérifier le titre de la recette
-                    if (termPattern.test(recipe.name)) {
+                    if (termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name)) {
                         termFound = true;
                     }
 
                     // Vérifier les ingrédients de la recette
                     for (let k = 0; k < recipe.ingredients.length; k++) {
-                        if (termPattern.test(recipe.ingredients[k].ingredient)) {
+                        if (termPatternSingular.test(recipe.ingredients[k].ingredient) || termPatternPlural.test(recipe.ingredients[k].ingredient)) {
                             termFound = true;
                             break;
                         }
                     }
 
                     // Vérifier la description de la recette
-                    if (termPattern.test(recipe.description)) {
+                    if (termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description)) {
                         termFound = true;
                     }
 
@@ -614,22 +628,36 @@ function handleSearchInput() {
     }
 }
 
+// Fonction pour obtenir la forme singulière et plurielle d'un terme
+function getSingularAndPluralForms(term) {
+    // Vérifie si le terme se termine par 's'
+    if (term.endsWith('s')) {
+        // Si le terme se termine par 's', il est probablement au pluriel
+        // On crée la forme singulière en retirant le dernier caractère 's'
+        return {
+            singular: term.slice(0, -1), // 0 étant le début de la chaîne de caractères et -1 le dernier caractère donc on retire le dernier caractère 's' pour obtenir la forme singulière => slice() extrait la chaîne de caractères s'arrétant au caractère juste avant le dernier caractère de la chaîne.
+            plural: term                // La forme plurielle est le terme original
+        };
+    } else {
+        // Si le terme ne se termine pas par 's', il est probablement au singulier
+        // On crée la forme plurielle en ajoutant un 's' à la fin
+        return {
+            singular: term,          // La forme singulière est le terme original
+            plural: term + 's'      // La forme plurielle est obtenue en ajoutant 's'
+        };
+    }
+}
+
+
 function extractSearchTerms(query) {
     // Diviser la recherche en termes en tenant compte des termes composés
     const terms = [];
     let currentTerm = '';  
-    let insideQuotes = false;
 
     for (let i = 0; i < query.length; i++) {
         const char = query[i];
         
-        if (char === '"') {
-            insideQuotes = !insideQuotes; // Activer/désactiver la détection des guillemets
-            if (!insideQuotes && currentTerm) {
-                terms.push(currentTerm.trim());
-                currentTerm = '';
-            }
-        } else if (char === ' ' && !insideQuotes) {
+        if (char === ' ') {
             if (currentTerm) {
                 terms.push(currentTerm.trim());
                 currentTerm = '';
@@ -639,6 +667,7 @@ function extractSearchTerms(query) {
         }
     }
 
+    // Ajouter le dernier terme si non vide
     if (currentTerm) {
         terms.push(currentTerm.trim());
     }
