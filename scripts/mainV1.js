@@ -1,6 +1,6 @@
-/* /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  mainv1.js : GESTION DE L'INTERACTION UTILISATEUR ET LOGIQUE DE FILTRAGE DES RECETTES
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* //////////////////////////////////////////////////////////////////////////////////////////////
+    MAINV1.JS : GESTION DE L'INTERACTION UTILISATEUR ET LOGIQUE DE FILTRAGE DES RECETTES
+///////////////////////////////////////////////////////////////////////////////////////////// */
 
 // Importation des modules
 import { recipes } from './data/recipes.js';
@@ -523,6 +523,9 @@ function handleSearchInput() {
                 return;
             }
 
+            /////// BOUCLE FOR ET STRUCTURE CONDITIONNELLE IF/ELSE ///////
+            /////////////////////////////////////////////////////////////
+
             // Extraire les termes de recherche avec des termes composés
             const terms = extractSearchTerms(query);
 
@@ -610,50 +613,61 @@ function handleSearchInput() {
     }
 }
 
-// Fonction pour obtenir la forme singulière et plurielle d'un terme
+///// Le reste du code est inchangé pour préserver son comportement d'origine /////
+// Fonction qui a pour but de générer les formes singulière et plurielle d'un mot (terme) donné
 function getSingularAndPluralForms(term) {
-    // Vérifie si le terme se termine par 's'
+    // Condition if qui vérifie si le mot (terme) se termine par un "s"
     if (term.endsWith('s')) {
-        // Si le terme se termine par 's', il est probablement au pluriel
-        // On crée la forme singulière en retirant le dernier caractère 's'
+        // Retourne un objet contenant les formes singulière et plurielle du terme
         return {
-            singular: term.slice(0, -1), // 0 étant le début de la chaîne de caractères et -1 le dernier caractère donc on retire le dernier caractère 's' pour obtenir la forme singulière => slice() extrait la chaîne de caractères s'arrétant au caractère juste avant le dernier caractère de la chaîne.
-            plural: term                // La forme plurielle est le terme original
+            // Méthode slice() extrait tous les caractères du terme sauf le dernier, ce qui permet d'obtenir sa forme singulière.
+            singular: term.slice(0, -1),
+            // Et la propriété plural est définie en conservant le terme tel quel, c'est à dire déjà au pluriel
+            plural: term
         };
     } else {
-        // Si le terme ne se termine pas par 's', il est probablement au singulier
-        // On crée la forme plurielle en ajoutant un 's' à la fin
         return {
-            singular: term,          // La forme singulière est le terme original
-            plural: term + 's'      // La forme plurielle est obtenue en ajoutant 's'
+            // Sinon, la propriété singular est définie en prenant le terme original qui ne se termine pas par un "s", donc il est déjà sous forme singulière
+            singular: term,
+            // Concaténation avec "s" pour définir le mot (terme) au pluriel
+            plural: term + 's'
         };
     }
 }
 
+// Fonction qui extrait les termes individuels (mots ou groupes de mots) d'une chaîne de caractères donnée, c'est à dire la requête de recherche de l'utilisateur
 function extractSearchTerms(query) {
-    // Diviser la recherche en termes en tenant compte des termes composés
+    // Déclaration d'un tableau vide terms qui va stocker les différents termes extraits de la requête. Chaque terme sera ajouté dans ce tableau après avoir été traité
     const terms = [];
+    // Déclaration d'une chaîne de caractères vide qui va servir à construire progressivement chaque terme de la requête
     let currentTerm = '';  
-
+    // Boucle for qui parcourt chaque caractère de la chaîne query
     for (let i = 0; i < query.length; i++) {
+        // Constante qui récupère le caractère actuel à l'index i dans la chaîne query. Cette ligne permet d'examiner chaque caractère individuellement
         const char = query[i];
-        
+        // Condition if qui vérifie si le caractère actuel char est un espace. Un espace marque la fin d'un terme dans la requête de recherche
         if (char === ' ') {
+            //Si la variable contient une chaîne non vide, c'est-à-dire qu'on a accumulé des caractères avant de rencontrer l'espace
             if (currentTerm) {
+                // On ajoute le terme complet au tableau terms. .trim() supprime les espaces inutiles au début et à la fin du terme, pour s'assurer que le terme est propre avant de l'ajouter 
                 terms.push(currentTerm.trim());
+                // Une fois le terme ajouté au tableau, la variable currentTerm est réinitialisée à une chaîne vide, prête à accumuler le prochain terme
                 currentTerm = '';
             }
+            // Si le caractère actuel n'est pas un espace, le code dans le bloc else est exécuté
         } else {
+            // Le caractère actuel char est ajouté à la variable currentTerm. Cela permet de construire progressivement un terme jusqu'à ce qu'un espace soit rencontré
             currentTerm += char;
         }
+        // Fin de la boucle for. À ce stade, tous les caractères de la chaîne query ont été parcourus
     }
-
-    // Ajouter le dernier terme si non vide
+    // Après la boucle, on vérifie si la variable currentTerm contient encore un terme (dans le cas où la chaîne query ne se termine pas par un espace). Si c'est le cas, on passe à l'étape suivante
     if (currentTerm) {
+        // Le terme restant (qui n'est pas suivi d'un espace) est ajouté au tableau terms après avoir été nettoyé avec .trim() pour supprimer les éventuels espaces superflus
         terms.push(currentTerm.trim());
     }
-
+    // La fonction retourne le tableau terms, qui contient tous les termes extraits de la chaîne query
     return terms;
 }
 
-handleSearchInput();
+handleSearchInput()
