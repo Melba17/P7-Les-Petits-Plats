@@ -1,11 +1,12 @@
-/* /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  mainv2.js : GESTION DE L'INTERACTION UTILISATEUR ET LOGIQUE DE FILTRAGE DES RECETTES
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
+/* /////////////////////////////////////////////////////////////////////////////////////////
+  MAINV2.JS : GESTION DE L'INTERACTION UTILISATEUR ET LOGIQUE DE FILTRAGE DES RECETTES
+//////////////////////////////////////////////////////////////////////////////////////// */
 
 // Importation des modules
 import { recipes } from './data/recipes.js';
 import { TemplateCards } from './pattern/templateCard.js';
 import { createFiltersButtons } from './utils/dropdowns.js';
+
 
 // Variables globales pour stocker les options/items et le dernier filtre sélectionné
 let selectedIngredients = [];
@@ -484,12 +485,161 @@ function initialize() {
     showRecipeCards(data);
     updateRecipeCounter(null);
     createFiltersButtons(data, selectIngredient, selectAppliance, selectUstensil);
-    
 }
 
 initialize();
 
 /* //////////////////////////////////////////////////////////////////////////////////////////////////////
-BARRE DE RECHERCHE PRINCIPALE - VERSION N°2 - TRI AVEC 
+        BARRE DE RECHERCHE PRINCIPALE - VERSION N°2 - TRI AVEC METHODES FILTER() ET SOME()
 ////////////////////////////////////////////////////////////////////////////////////////////////////// */
 
+let mainSearchResults = null;
+let typingTimer;
+const typingInterval = 500;
+
+function handleSearchInput() {
+    const searchInput = document.querySelector('.searchbar');
+    const crossIcon = document.querySelector('.cross-icon');
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(typingTimer);
+
+        typingTimer = setTimeout(() => {
+            const query = searchInput.value.toLowerCase().trim();
+
+            const errorContainer = document.querySelector('.error-container');
+            if (errorContainer) {
+                errorContainer.innerHTML = ''; 
+            }
+
+            if (query.length < 3) {
+                mainSearchResults = null;
+                showRecipeCards(recipes);
+                updateRecipeCounter(1500);
+                filterAndShowRecipes();
+                return;
+            }
+
+      ///////////// METHODE FILTER() ET SOME() /////////////////
+      //////////////////////////////////////////////////////////
+            const terms = extractSearchTerms(query);
+
+            // Filtrer les recettes en utilisant filter() et some()
+            const filteredRecipes = recipes.filter(recipe => {
+                return terms.every(term => {
+                    const { singular, plural } = getSingularAndPluralForms(term);
+
+                    // Tester si le terme (singulier/pluriel) est trouvé dans le titre, les ingrédients ou la description
+                    const termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');
+                    const termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');
+
+                    // Vérifier le titre
+                    const titleMatch = termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name);
+
+                    // Vérifier les ingrédients avec some()
+                    const ingredientMatch = recipe.ingredients.some(ingredient => 
+                        termPatternSingular.test(ingredient.ingredient) || termPatternPlural.test(ingredient.ingredient)
+                    );
+
+                    // Vérifier la description
+                    const descriptionMatch = termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description);
+
+                    // Si le terme est trouvé dans l'un de ces trois champs, retourner true
+                    return titleMatch || ingredientMatch || descriptionMatch;
+                });
+            });
+
+            if (filteredRecipes.length > 0) {
+                mainSearchResults = filteredRecipes;
+                showRecipeCards(filteredRecipes);
+                updateDropdownOptions(filteredRecipes);
+                updateRecipeCounter(filteredRecipes.length);
+            } else {
+                mainSearchResults = [];
+                showRecipeCards([]);
+                updateDropdownOptions([]);
+                updateRecipeCounter(0);
+                showError(document.querySelector('.error-container'), query);
+            }
+        }, typingInterval);
+    });
+
+    if (searchInput && crossIcon) {
+        searchInput.addEventListener('input', () => {
+            crossIcon.classList.toggle('visible', searchInput.value.length > 2);
+        });
+
+        crossIcon.addEventListener('click', () => {
+            searchInput.value = '';
+            crossIcon.classList.remove('visible');
+            mainSearchResults = null;
+            updateRecipeCounter(1500);
+            showRecipeCards(recipes);
+            filterAndShowRecipes();
+
+            const errorContainer = document.querySelector('.error-container');
+            if (errorContainer) {
+                errorContainer.innerHTML = ''; 
+            }
+        });
+    }
+}
+
+///// Le reste du code est inchangé pour préserver son comportement d'origine /////
+// Fonction qui a pour but de générer les formes singulière et plurielle d'un mot (terme) donné
+function getSingularAndPluralForms(term) {
+    // Condition if qui vérifie si le mot (terme) se termine par un "s"
+    if (term.endsWith('s')) {
+        // Retourne un objet contenant les formes singulière et plurielle du terme
+        return {
+            // Méthode slice() extrait tous les caractères du terme sauf le dernier, ce qui permet d'obtenir sa forme singulière.
+            singular: term.slice(0, -1),
+            // Et la propriété plural est définie en conservant le terme tel quel, c'est à dire déjà au pluriel
+            plural: term
+        };
+    } else {
+        return {
+            // Sinon, la propriété singular est définie en prenant le terme original qui ne se termine pas par un "s", donc il est déjà sous forme singulière
+            singular: term,
+            // Concaténation avec "s" pour définir le mot (terme) au pluriel
+            plural: term + 's'
+        };
+    }
+}
+
+// Fonction qui extrait les termes individuels (mots ou groupes de mots) d'une chaîne de caractères donnée, c'est à dire la requête de recherche de l'utilisateur
+function extractSearchTerms(query) {
+    // Déclaration d'un tableau vide terms qui va stocker les différents termes extraits de la requête. Chaque terme sera ajouté dans ce tableau après avoir été traité
+    const terms = [];
+    // Déclaration d'une chaîne de caractères vide qui va servir à construire progressivement chaque terme de la requête
+    let currentTerm = '';  
+    // Boucle for qui parcourt chaque caractère de la chaîne query
+    for (let i = 0; i < query.length; i++) {
+        // Constante qui récupère le caractère actuel à l'index i dans la chaîne query. Cette ligne permet d'examiner chaque caractère individuellement
+        const char = query[i];
+        // Condition if qui vérifie si le caractère actuel char est un espace. Un espace marque la fin d'un terme dans la requête de recherche
+        if (char === ' ') {
+            //Si la variable contient une chaîne non vide, c'est-à-dire qu'on a accumulé des caractères avant de rencontrer l'espace
+            if (currentTerm) {
+                // On ajoute le terme complet au tableau terms. .trim() supprime les espaces inutiles au début et à la fin du terme, pour s'assurer que le terme est propre avant de l'ajouter 
+                terms.push(currentTerm.trim());
+                // Une fois le terme ajouté au tableau, la variable currentTerm est réinitialisée à une chaîne vide, prête à accumuler le prochain terme
+                currentTerm = '';
+            }
+            // Si le caractère actuel n'est pas un espace, le code dans le bloc else est exécuté
+        } else {
+            // Le caractère actuel char est ajouté à la variable currentTerm. Cela permet de construire progressivement un terme jusqu'à ce qu'un espace soit rencontré
+            currentTerm += char;
+        }
+        // Fin de la boucle for. À ce stade, tous les caractères de la chaîne query ont été parcourus
+    }
+    // Après la boucle, on vérifie si la variable currentTerm contient encore un terme (dans le cas où la chaîne query ne se termine pas par un espace). Si c'est le cas, on passe à l'étape suivante
+    if (currentTerm) {
+        // Le terme restant (qui n'est pas suivi d'un espace) est ajouté au tableau terms après avoir été nettoyé avec .trim() pour supprimer les éventuels espaces superflus
+        terms.push(currentTerm.trim());
+    }
+    // La fonction retourne le tableau terms, qui contient tous les termes extraits de la chaîne query
+    return terms;
+}
+
+handleSearchInput()
