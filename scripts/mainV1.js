@@ -167,7 +167,7 @@ function selectUstensil(ustensil) {
    FONCTIONS DE MISE À JOUR DES OPTIONS ET SÉLECTIONS
 /////////////////////////////////////////////////// */
 
-// Fonction générale, responsable de la coordination de la mise à jour des options des trois listes déroulantes (ingrédients, appareils, ustensiles) en appelant updateDropdown() sur chacune d'elle.
+// Fonction pour mettre à jour les options des listes déroulantes (ingrédients, appareils, ustensiles)
 function updateDropdownOptions(filteredRecipes) {
     const ingredients = new Set();
     const appliances = new Set();
@@ -184,226 +184,153 @@ function updateDropdownOptions(filteredRecipes) {
     updateDropdown('dropdownUstensils', Array.from(ustensils), 'ustensils');
 }
 
-// Fonction pour mettre à jour une liste déroulante spécifique avec les données qui lui sont fournies, donc ne gère qu'une seule liste déroulante à la fois
+// Fonction pour mettre à jour une liste déroulante spécifique
 function updateDropdown(id, items, type) {
     const dropdownList = document.querySelector(`#${id} .list-container`);
+    if (!dropdownList) return console.error(`#${id} .list-container non trouvé`);
 
-    if (dropdownList) {
-        dropdownList.innerHTML = ''; // Vide la liste des éléments
+    dropdownList.innerHTML = ''; // Vider la liste d'éléments
 
-        // Remplit la liste d'items
-        items.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'item';
-            itemElement.tabIndex = '0';
-            itemElement.textContent = item;
-
-            // Vérifie si l'élément est déjà sélectionné
-            if (isItemSelected(type, item)) {
-                itemElement.classList.add('choice-item');
-                const removeIcon = document.createElement('i');
-                removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';
-                removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-                removeIcon.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Empêche la propagation de l'événement de clic
-                    handleItemDeselect(type, item, itemElement);
-                });
-                itemElement.appendChild(removeIcon);
-            }
-
-            itemElement.addEventListener('click', () => {
-                handleItemSelectOrDeselect(type, item, itemElement);
-            });
-
-            dropdownList.appendChild(itemElement);
-        });
-    } else {
-        console.error(`#${id} .list-container non trouvé`);
-    }
+    items.forEach(item => {
+        const itemElement = createDropdownItem(item, type);
+        dropdownList.appendChild(itemElement);
+    });
 }
 
-// Fonction pour gérer la sélection ou désélection d'un item
-function handleItemSelectOrDeselect(type, item, itemElement) {
-    if (itemElement.classList.contains('choice-item')) {
-        handleItemDeselect(type, item, itemElement);
-    } else {
-        selectItem(type, item);
+// Crée un élément de liste déroulante avec gestion des événements
+function createDropdownItem(item, type) {
+    const itemElement = document.createElement('div');
+    itemElement.className = 'item';
+    itemElement.tabIndex = '0';
+    itemElement.textContent = item;
+
+    if (isItemSelected(type, item)) {
         itemElement.classList.add('choice-item');
         addRemoveIcon(itemElement, type, item);
     }
 
-    updateSelectedItems();
+    itemElement.addEventListener('click', () => handleItemSelectOrDeselect(type, item, itemElement));
+
+    return itemElement;
+}
+
+// Gestion de la sélection ou désélection d'un élément
+function handleItemSelectOrDeselect(type, item, itemElement) {
+    if (itemElement.classList.contains('choice-item')) {
+        handleItemDeselect(type, item, itemElement);
+    } else {
+        handleItemSelect(type, item, itemElement);
+    }
+    updateSelectedItems();  // Mettre à jour les tags sous les filtres
     filterAndShowRecipes();
 }
 
-// Fonction pour désélectionner un item
+// Sélection d'un élément
+function handleItemSelect(type, item, itemElement) {
+    selectItem(type, item);
+    itemElement.classList.add('choice-item');
+    addRemoveIcon(itemElement, type, item);
+}
+
+// Désélection d'un élément
 function handleItemDeselect(type, item, itemElement) {
     deselectItem(type, item);
     itemElement.classList.remove('choice-item');
     const removeIcon = itemElement.querySelector('.remove-icon');
-    if (removeIcon) {
-        removeIcon.remove();
-    }
-
-    updateSelectedItems();
-    filterAndShowRecipes();
+    if (removeIcon) removeIcon.remove();
 }
 
-// Fonction pour ajouter l'icône de suppression (pour ne pas répéter le code)
+// Ajoute une icône de suppression à un élément
 function addRemoveIcon(itemElement, type, item) {
     const removeIcon = document.createElement('i');
     removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';
     removeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-    removeIcon.addEventListener('click', (e) => {
-        e.stopPropagation(); // Garantit que le clic sur l'icône de suppression n'affecte pas d'autres éléments
+    removeIcon.addEventListener('click', e => {
+        e.stopPropagation();
         handleItemDeselect(type, item, itemElement);
+        updateSelectedItems();  // Mettre à jour les tags sous les filtres
+        filterAndShowRecipes(); // Mettre à jour les recettes après la suppression
     });
     itemElement.appendChild(removeIcon);
 }
 
-
-// Fonction pour vérifier si un élément est sélectionné
+// Vérifie si un élément est sélectionné
 function isItemSelected(type, item) {
-    let selectedList;
-    switch (type) {
-        case 'ingredients':
-            selectedList = selectedIngredients;
-            break;
-        case 'appliances':
-            selectedList = selectedAppliances;
-            break;
-        case 'ustensils':
-            selectedList = selectedUstensils;
-            break;
-        default:
-            console.error('Type de filtre inconnu');
-            return false;
-    }
+    const selectedList = getSelectedList(type);
     return selectedList.includes(item.toLowerCase());
 }
 
-// Fonction pour sélectionner un élément
+// Sélectionne un élément
 function selectItem(type, item) {
-    let selectedList;
-    switch (type) {
-        case 'ingredients':
-            selectedList = selectedIngredients;
-            break;
-        case 'appliances':
-            selectedList = selectedAppliances;
-            break;
-        case 'ustensils':
-            selectedList = selectedUstensils;
-            break;
-        default:
-            console.error('Type de filtre inconnu');
-            return;
-    }
+    const selectedList = getSelectedList(type);
     const lowerItem = item.toLowerCase();
-    if (!selectedList.includes(lowerItem)) {
-        selectedList.push(lowerItem);
-    }
+    if (!selectedList.includes(lowerItem)) selectedList.push(lowerItem);
 }
 
-// Fonction pour désélectionner un élément
+// Désélectionne un élément
 function deselectItem(type, item) {
-    let selectedList;
-    switch (type) {
-        case 'ingredients':
-            selectedList = selectedIngredients;
-            break;
-        case 'appliances':
-            selectedList = selectedAppliances;
-            break;
-        case 'ustensils':
-            selectedList = selectedUstensils;
-            break;
-        default:
-            console.error('Type de filtre inconnu');
-            return;
-    }
+    const selectedList = getSelectedList(type);
     const lowerItem = item.toLowerCase();
     const index = selectedList.indexOf(lowerItem);
-    if (index !== -1) {
-        selectedList.splice(index, 1);
+    if (index !== -1) selectedList.splice(index, 1);
+}
+
+// Récupère la liste des éléments sélectionnés en fonction du type
+function getSelectedList(type) {
+    switch (type) {
+        case 'ingredients': return selectedIngredients;
+        case 'appliances': return selectedAppliances;
+        case 'ustensils': return selectedUstensils;
+        default: console.error('Type de filtre inconnu'); return [];
     }
 }
 
-// Fonction pour afficher les éléments sélectionnés sous les boutons de filtre / Tags
+// Affiche les éléments sélectionnés sous les filtres
 function updateSelectedItems() {
     const optionsContainer = document.querySelector('.options-container') || createOptionsContainer();
     optionsContainer.innerHTML = '';
 
-    // Objet pour mapper les listes sélectionnées aux fonctions de sélection
-    const selectionMap = {
-        ingredients: {
-            list: selectedIngredients,
-            selectFunction: selectIngredient
-        },
-        appliances: {
-            list: selectedAppliances,
-            selectFunction: selectAppliance
-        },
-        ustensils: {
-            list: selectedUstensils,
-            selectFunction: selectUstensil
-        }
-    };
-
-    // Fonction pour créer les éléments sélectionnés
-    function createSelectedItems(type) {
-        const { list, selectFunction } = selectionMap[type];
-
-        list.forEach(item => {
-            const selectedItem = document.createElement('div');
-            selectedItem.className = 'selected-item';
-            selectedItem.style.display = 'block';
-            selectedItem.tabIndex = '0'; // Rendre l'élément focusable
-
-            const textContainer = document.createElement('span');
-            textContainer.className = 'option-text';
-            textContainer.textContent = item;
-            selectedItem.appendChild(textContainer);
-
-            const closeIcon = document.createElement('i');
-            closeIcon.className = 'fa-solid fa-xmark cross-item';
-            closeIcon.setAttribute('aria-label', 'Supprimer la sélection');
-
-            closeIcon.addEventListener('click', () => {
-                selectFunction(item);
-            });
-
-            selectedItem.appendChild(closeIcon);
-            optionsContainer.appendChild(selectedItem);
-
-            // Ajouter gestion des événements clavier pour les éléments sélectionnés
-            selectedItem.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    selectFunction(item);
-                }
-            });
-        });
-    }
-
-    // Appelle la fonction de création pour chaque type
-    createSelectedItems('ingredients');
-    createSelectedItems('appliances');
-    createSelectedItems('ustensils');
+    // Crée les tags pour chaque type
+    ['ingredients', 'appliances', 'ustensils'].forEach(createSelectedItems);
 }
 
-// Fonction pour créer le conteneur des éléments sélectionnés
+// Crée et affiche les tags d'éléments sélectionnés
+function createSelectedItems(type) {
+    const selectedList = getSelectedList(type);
+    selectedList.forEach(item => {
+        const selectedItem = document.createElement('div');
+        selectedItem.className = 'selected-item';
+        selectedItem.tabIndex = '0';
+
+        const textContainer = document.createElement('span');
+        textContainer.className = 'option-text';
+        textContainer.textContent = item;
+
+        const closeIcon = document.createElement('i');
+        closeIcon.className = 'fa-solid fa-xmark cross-item';
+        closeIcon.setAttribute('aria-label', 'Supprimer la sélection');
+        closeIcon.addEventListener('click', () => {
+            deselectItem(type, item);  // Supprimer l'élément de la sélection
+            updateSelectedItems();     // Mettre à jour l'affichage des tags
+            filterAndShowRecipes();    // Réappliquer les filtres après suppression
+        });
+
+        selectedItem.appendChild(textContainer);
+        selectedItem.appendChild(closeIcon);
+        document.querySelector('.options-container').appendChild(selectedItem);
+    });
+}
+
+// Crée le conteneur des éléments sélectionnés sous les filtres
 function createOptionsContainer() {
     const optionsContainer = document.createElement('div');
     optionsContainer.className = 'options-container';
     const flexContainer = document.querySelector('.flex');
-    if (flexContainer) {
-        flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);
-    } else {
-        console.error('.flex non trouvé pour créer le conteneur');
-    }
+    if (flexContainer) flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);
+    else console.error('.flex non trouvé pour créer le conteneur');
     return optionsContainer;
 }
+
 
 /* //////////////////////////////////////////
    FONCTIONS D'UI ET GESTION DES ERREURS
