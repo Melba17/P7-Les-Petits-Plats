@@ -147,7 +147,7 @@ function createSearchArea(listContainer, items, selectCallback) {
         searchInput.value = '';
         clearIcon.style.display = 'none';
         searchInput.focus(); // Re-focus sur le champ de recherche après la suppression
-        displayList(listContainer, uniqueItems, selectCallback);
+        displayList(listContainer, filteredItems, selectCallback);
     });
 
     // Gestion des événements clavier pour la croix
@@ -156,7 +156,7 @@ function createSearchArea(listContainer, items, selectCallback) {
             event.preventDefault(); // Empêche l'action par défaut de l'événement
             searchInput.value = ''; // Efface le texte de la recherche
             clearIcon.style.display = 'none'; // Masque la croix
-            displayList(listContainer, uniqueItems, selectCallback); // Réaffiche la liste complète
+            displayList(listContainer, filteredItems, selectCallback); // Réaffiche la liste complète
             searchInput.focus(); // Re-focus sur le champ de recherche
         }
     });
