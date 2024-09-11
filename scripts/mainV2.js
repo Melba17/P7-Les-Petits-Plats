@@ -394,7 +394,7 @@ function showError(container, item) {
 
     // Ajoute le texte final du message d'erreur
     const additionalText = document.createElement('span');
-    additionalText.textContent = ". Veuillez faire une nouvelle recherche, svp.";
+    additionalText.textContent = ". Essayez une autre recherche svp.";
     errorMessage.appendChild(additionalText);
 
     // Ajoute le message d'erreur au conteneur
