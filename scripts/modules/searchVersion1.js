@@ -37,9 +37,10 @@ export function handleSearchInput() {
                 filterAndShowRecipes();  // Réinitialise les filtres
                 return;
             }
-
-            // Utilisation des expressions régulières pour extraire les termes de recherche
+            
             const terms = extractSearchTerms(query);  // Extrait les différents termes de la requête
+
+            ////////////////////// VERSION N°1 DE TRI /////////////////////////////////////////////////
             const filteredRecipes = [];  // Tableau pour stocker les recettes filtrées
 
             for (let i = 0; i < recipes.length; i++) {
