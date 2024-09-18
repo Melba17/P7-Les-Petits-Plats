@@ -136,12 +136,12 @@ function removeRemoveIcon(itemElement) {
 ///////////////////////////////////////////////*/
  function createDropdown(id, label, items, selectItem, recipes) { 
     let dropdownWrapper = document.querySelector(`#${id}`);  // Sélectionne le conteneur du menu déroulant par son ID
-
+    
     // Si le conteneur n'existe pas, on le crée
     if (!dropdownWrapper) {
         // Crée un élément `div` pour contenir le menu déroulant
         dropdownWrapper = createElement('div', { class: 'dropdown-wrapper', id: id });
-
+        
         // Crée un bouton pour ouvrir/fermer le menu déroulant
         const button = createElement('button', {
             class: 'dropdown',  // Ajoute la classe CSS 'dropdown'
