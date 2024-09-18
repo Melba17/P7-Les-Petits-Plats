@@ -64,7 +64,7 @@ export function adjustGridMargin() {
 /* //////////////////////////////////////////
    AFFICHAGE D'UN MESSAGE D'ERREUR
 ////////////////////////////////////////// */
-export function showError(container, item) {
+export function showError(container, query) {
     // Si aucun conteneur d'erreur n'est passé, essaie de trouver un conteneur existant, sinon en crée un nouveau.
     if (!container) {
         let existingContainer = document.querySelector('.error-container');  // Cherche un conteneur d'erreur existant.
@@ -83,10 +83,10 @@ export function showError(container, item) {
     messageText.textContent = "Aucune recette ne contient ";  // Définit le texte principal du message d'erreur.
     errorMessage.appendChild(messageText);  // Ajoute le texte principal au message d'erreur.
 
-    const errorItem = document.createElement('span');  // Crée un span pour l'élément causant l'erreur (ex. un ingrédient non trouvé).
-    errorItem.className = 'error-item';  // Ajoute la classe `error-item` pour styliser cet élément.
-    errorItem.textContent = item;  // Définit le texte de l'élément en erreur (ce qui a été recherché).
-    errorMessage.appendChild(errorItem);  // Ajoute l'élément en erreur au message.
+    const errorQuery = document.createElement('span');  // Crée un span pour l'élément causant l'erreur (ex. un ingrédient non trouvé).
+    errorQuery.className = 'error-item';  // Ajoute la classe `error-item` pour styliser cet élément.
+    errorQuery.textContent = query;  // Définit le texte de l'élément en erreur (ce qui a été recherché).
+    errorMessage.appendChild(errorQuery);  // Ajoute l'élément en erreur au message.
 
     const additionalText = document.createElement('span');  // Crée un span pour ajouter un texte supplémentaire après l'élément en erreur.
     additionalText.textContent = ". Essayez une autre recherche svp.";  // Définit le texte supplémentaire.

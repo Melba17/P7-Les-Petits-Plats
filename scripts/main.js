@@ -29,7 +29,7 @@ function initialize() {
     showRecipeCards(data);  // Affiche toutes les recettes récupérées sur l'interface utilisateur.
     updateRecipeCounter(1500);  // Initialise ou réinitialise le compteur à 1500 recettes.
 
-    // Crée les boutons des filtres (ingrédients, appareils, ustensiles) et passe les fonctions de sélection spécifiques à chaque type d'élément.
+    // Crée les boutons des filtres (ingrédients, appareils, ustensiles) et passe les fonctions de sélection spécifiques à chaque type d'élément selon la requête de l'utilisateur
     createFiltersButtons(data,  
         (ingredient) => selectIngredient(ingredient, data),  // Passe la sélection d'ingrédients à la fonction `selectIngredient`.
         (appliance) => selectAppliance(appliance, data),  // Passe la sélection d'appareils à la fonction `selectAppliance`.
@@ -37,7 +37,7 @@ function initialize() {
     );
     
     filterAndShowRecipes(data);  // Filtre et affiche les recettes selon les filtres appliqués.
-    handleSearchInput(data);  // Gère les interactions de la barre de recherche principale avec les recettes disponibles.
+    handleSearchInput(data);  // Gère les interactions de la barre de recherche principale avec les recettes disponibles selon la requête de l'utilisateur
 }
 
 // Appelle la fonction d'initialisation pour démarrer le projet
