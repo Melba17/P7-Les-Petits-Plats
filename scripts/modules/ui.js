@@ -41,9 +41,9 @@ export function closeDropdown() {
         if (button) {
             button.setAttribute("aria-expanded", "false");  // Change l'attribut pour marquer le menu comme fermé.
             button.classList.remove('show');  // Retire la classe `show` pour fermer le menu visuellement.
-            const content = document.querySelector(`${selector.replace('Button', '')} .dropdown-content`);  // Sélectionne le contenu du menu déroulant.
+            const content = document.querySelector(`${selector.replace('Button', '')} .dropdown-content`);  // Sélectionne le contenu du menu déroulant en remplaçant 'button' par 'dropdown-content' donc récupérer le menu déroulant...
             if (content) {
-                content.style.display = 'none';  // Cache le contenu du menu.
+                content.style.display = 'none';  // ...et le cacher 
             }
         }
     });
