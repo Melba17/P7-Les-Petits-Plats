@@ -17,6 +17,7 @@ let isGridMarginAdjusted = false;  // Indique si la marge de la grille a été a
 /* //////////////////////////////////////////
     FILTRAGE ET AFFICHAGE DES RECETTES
 ////////////////////////////////////////// */
+// Fonction qui gère les filtres supplémentaires, issus des menus déroulants, sur les résultats de la recherche principale faite par l'utilisateur
 export function filterAndShowRecipes(recipes = getData()) {
     const mainSearchResults = getMainSearchResults();  // Récupère les résultats de la recherche principale
 
@@ -37,37 +38,23 @@ export function filterAndShowRecipes(recipes = getData()) {
     updateDropdownOptions(filteredRecipes);  // Met à jour les options des menus déroulants
     showRecipeCards(filteredRecipes);  // Affiche les recettes filtrées
 
-    // Mise à jour du compteur en fonction des filtres actifs
+    // Détermine le nombre à afficher pour le compteur selon les recettes restantes 
+    let recipeCount;
     if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
-        if (mainSearchResults === null || mainSearchResults.length === 0) {
-            updateRecipeCounter(1500);  // Réinitialise à 1500 si aucune recherche effectuée ou si les résultats sont vides
-        } else {
-            updateRecipeCounter(mainSearchResults.length);  // Affiche le nombre de recettes de la recherche principale
-        }
-
-        // Ajuste la marge de la grille si aucune recette n'est trouvée
-        if (filteredRecipes.length === 0 && !isGridMarginAdjusted) {
-            adjustGridMargin();  // Ajuste la marge de la grille
-            isGridMarginAdjusted = true;  // Marque la grille comme ajustée
-        }
+        recipeCount = (mainSearchResults === null || mainSearchResults.length === 0) ? 1500 : mainSearchResults.length;
     } else {
-        updateRecipeCounter(filteredRecipes.length);  // Met à jour le compteur avec le nombre de recettes filtrées
-
-        // Ajuste la marge de la grille si des filtres sont actifs
-        if ((selectedIngredients.length > 0 || selectedAppliances.length > 0 || selectedUstensils.length > 0) && !isGridMarginAdjusted) {
-            adjustGridMargin();  // Ajuste la marge de la grille
-            isGridMarginAdjusted = true;  // Marque la grille comme ajustée
-        }
+        recipeCount = filteredRecipes.length;
     }
 
-    const optionsContainer = document.querySelector('.options-container');
-    const errorContainer = document.querySelector('.error-container');
+    // Mise à jour du compteur avec le nombre de recettes
+    updateRecipeCounter(recipeCount);
 
-    // Affiche un message d'erreur si aucune recette n'est trouvée
-    if (filteredRecipes.length === 0 && optionsContainer && lastSelectedFilter) {
-        showError(errorContainer, lastSelectedFilter);
-    } else if (errorContainer) {
-        errorContainer.remove();  // Supprime le message d'erreur si des recettes sont trouvées
+    // Ajuster la marge de la grille si nécessaire
+    if (filteredRecipes.length === 0 || (selectedIngredients.length > 0 || selectedAppliances.length > 0 || selectedUstensils.length > 0)) {
+        if (!isGridMarginAdjusted) {
+            adjustGridMargin();  // Ajuste la marge de la grille
+            isGridMarginAdjusted = true;  // Marque la grille comme ajustée
+        }
     }
 }
 
