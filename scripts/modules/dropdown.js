@@ -1,140 +1,26 @@
-// dropdown.js : GÉNÉRATION ET GESTION DES MENUS DÉROULANTS POUR LES FILTRES (INGRÉDIENTS, APPAREILS, USTENSILES) 
-// INTÉRACTIONS UTILISATEUR
-
-import { selectItem, deselectItem, updateSelectedItems, filterAndShowRecipes } from './filter.js';
+// dropdown.js : gère l'interface et le comportement des menus déroulants où l'utilisateur sélectionne ces filtres, en bref, gère les menus de sélection des filtres.
+import { selectItem, deselectItem, updateSelectedItems, filterAndShowRecipes, isItemSelected } from './filter.js';
 import { getMainSearchResults } from './state.js';
-import { isItemSelected } from './filter.js';
-import { getData } from '../main.js';
+import { toggleDropdownIcon, addRemoveIcon, removeRemoveIcon } from './ui.js';
 
-/* //////////////////////////////////////////////////////////////////////////
-   OBJET POUR STOCKER LES ÉLÉMENTS FILTRÉS APRÈS LA PREMIÈRE RECHERCHE
-////////////////////////////////////////////////////////////////////////// */
-let firstFilteredItems = {
-    ingredients: [], // Stocke la liste des ingrédients filtrés
-    appliances: [], // idem pour les appareils
-    ustensils: []   // // idem pour les ustensiles
+/* ///////////////////////////////////////////////////////
+   CRÉATION D'UN ÉLÉMENT DOM AVEC ATTRIBUTS ET ENFANTS 
+/////////////////////////////////////////////////////// */
+// Fonction qui crée un élément DOM avec ses attributs et enfants
+function createElement(type, attributes = {}, children = []) {
+    const element = document.createElement(type);  // Crée un élément pour un type donné
+    // Méthode Object.keys(attributes) renvoie un tableau contenant les noms des propriétés (ou clés) d'un objet
+    // element.setAttribute(attr, attributes[attr]) ajoute à l'élément HTML un attribut dont le nom attr correspond à la propriété en question, et attributes[attr] à la valeur de cette propriété
+    Object.keys(attributes).forEach(attr => element.setAttribute(attr, attributes[attr]));  
+    children.forEach(child => element.appendChild(child));  // Ajoute les enfants
+    return element;  // Retourne l'élément créé
 }
 
-/* ////////////////////////////////////////////////////////////////////////////
-   CRÉATION DES BOUTONS DE FILTRES (INGRÉDIENTS, APPAREILS, USTENSILES)
-//////////////////////////////////////////////////////////////////////////// */
-// Fonction qui crée les boutons pour les listes déroulantes des filtres (ingrédients, appareils, ustensiles)
-export function createFiltersButtons(recipes = getData()) {  
-    const mainSearchResults = getMainSearchResults();  // Récupère les résultats de la recherche principale
 
-    // Crée les menus déroulants pour chaque type de filtre (ingrédients, appareils, ustensiles)
-    createDropdown('dropdownIngredients', 'Ingrédients', recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)), (item) => selectItem('ingredient', item, recipes), mainSearchResults, recipes);
-    createDropdown('dropdownAppliances', 'Appareils', recipes.map(recipe => recipe.appliance), (item) => selectItem('appliance', item, recipes), mainSearchResults, recipes);
-    createDropdown('dropdownUstensils', 'Ustensiles', recipes.flatMap(recipe => recipe.ustensils), (item) => selectItem('ustensil', item, recipes), mainSearchResults, recipes);
-}
-
-/* ///////////////////////////////////////////////////////////////////////
-   MISE À JOUR DES OPTIONS DES LISTES DÉROULANTES  APRÈS UN FILTRAGE
-/////////////////////////////////////////////////////////////////////// */
-// Fonction pour mettre à jour les options des menus déroulants après un filtrage des recettes
-export function updateDropdownOptions(filteredRecipes) {
-    const ingredients = new Set();  // Utilise un Set pour garantir des valeurs uniques
-    const appliances = new Set();  // Utilise un Set pour garantir des valeurs uniques pour les appareils
-    const ustensils = new Set();  // Utilise un Set pour garantir des valeurs uniques pour les ustensiles
-
-    // Remplit les Sets avec les ingrédients, appareils et ustensiles filtrés
-    filteredRecipes.forEach(recipe => {
-        recipe.ingredients.forEach(ing => ingredients.add(ing.ingredient.toLowerCase()));
-        appliances.add(recipe.appliance.toLowerCase());
-        recipe.ustensils.forEach(ust => ustensils.add(ust.toLowerCase()));
-    });
-
-    // Stocke les résultats filtrés dans l'objet `firstFilteredItems`
-    firstFilteredItems.ingredients = Array.from(ingredients);
-    firstFilteredItems.appliances = Array.from(appliances);
-    firstFilteredItems.ustensils = Array.from(ustensils);
-
-    // Met à jour les listes déroulantes avec les nouvelles options filtrées
-    updateDropdown('dropdownIngredients', firstFilteredItems.ingredients, 'ingredient', filteredRecipes);
-    updateDropdown('dropdownAppliances', firstFilteredItems.appliances, 'appliance', filteredRecipes);
-    updateDropdown('dropdownUstensils', firstFilteredItems.ustensils, 'ustensil', filteredRecipes);
-}
-
-/* /////////////////////////////////////////////////////
-   MISE À JOUR DE LA LISTE DANS LE MENU DÉROULANT
-/////////////////////////////////////////////////// */
-// Fonction qui met à jour les éléments dans le menu déroulant (dropdown)
-function updateDropdown(id, items, type, recipes) {
-    const dropdownList = document.querySelector(`#${id} .list-container`);  // Sélectionne la liste du menu déroulant par son ID
-    if (!dropdownList) return console.error(`#${id} .list-container non trouvé`);  // Affiche une erreur si la liste n'est pas trouvée
-
-    dropdownList.innerHTML = '';  // Réinitialise la liste déroulante
-
-    // Parcourt chaque élément à ajouter à la liste déroulante
-    items.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'item';  // Définit la classe `item` pour chaque élément
-        itemElement.tabIndex = '0';  // Rend l'élément focusable
-        itemElement.textContent = item;  // Définit le contenu textuel de l'élément
-
-        // Si l'élément est déjà sélectionné, on ajoute la classe `choice-item`
-        if (isItemSelected(type, item)) {
-            itemElement.classList.add('choice-item');
-            addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
-        }
-
-        // Gère la logique de sélection/désélection des éléments au clic
-        itemElement.addEventListener('click', () => {
-            if (itemElement.classList.contains('choice-item')) {
-                deselectItem(type, item);  // Désélectionne l'élément
-                itemElement.classList.remove('choice-item');
-                removeRemoveIcon(itemElement);  // Supprime l'icône de suppression
-            } else {
-                selectItem(type, item, recipes);  // Sélectionne l'élément
-                itemElement.classList.add('choice-item');
-                addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
-            }
-            
-            updateSelectedItems();  // Met à jour visuellement les éléments sélectionnés
-            filterAndShowRecipes(recipes);  // Filtre et affiche les recettes en fonction des sélections
-        });
-
-        dropdownList.appendChild(itemElement);  // Ajoute l'élément à la liste déroulante
-    });
-}
-
-/* //////////////////////////////////////////////////////////////////
-   AJOUT D'UNE ICÔNE DE SUPPRESSION SUR UN ÉLÉMENT SÉLECTIONNÉ
-///////////////////////////////////////////////////////////////// */
-// Fonction pour ajouter une icône de suppression à un élément sélectionné
-function addRemoveIcon(itemElement, type, item) {
-    const removeIcon = document.createElement('i');  // Crée un élément icône
-    removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';  // Définit la classe de l'icône
-    removeIcon.setAttribute('aria-label', 'Supprimer la sélection');  // Ajoute une description ARIA pour l'accessibilité
-
-    // Gère l'événement de clic sur l'icône de suppression
-    removeIcon.addEventListener('click', e => {
-        e.stopPropagation();  // Empêche la propagation du clic vers d'autres éléments
-        deselectItem(type, item);  // Désélectionne l'élément
-        itemElement.classList.remove('choice-item');  // Retire la mise en évidence de l'élément sélectionné
-        removeRemoveIcon(itemElement);  // Supprime l'icône de suppression
-        updateSelectedItems();  // Met à jour visuellement les éléments sous les filtres
-        filterAndShowRecipes();  // Réapplique les filtres et affiche les recettes
-    });
-
-    itemElement.appendChild(removeIcon);  // Ajoute l'icône à l'élément
-}
-
-/* //////////////////////////////////////////
-   SUPPRESSION DE L'ICÔNE DE SUPPRESSION
-////////////////////////////////////////// */
-// Fonction pour supprimer l'icône de suppression d'un élément
-function removeRemoveIcon(itemElement) {
-    const removeIcon = itemElement.querySelector('.remove-icon');  // Sélectionne l'icône de suppression
-    if (removeIcon) {
-        removeIcon.remove();  // Supprime l'icône si elle est présente
-    }
-}
-
-/* //////////////////////////////////////////////
-    FONCTION POUR CRÉER UN MENU DÉROULANT
-///////////////////////////////////////////////*/
- function createDropdown(id, label, items, selectItem, recipes) { 
+/* ////////////////////////////////////////////////////////////
+    FONCTION POUR CRÉER VISUELLEMENT UN MENU DÉROULANT
+//////////////////////////////////////////////////////////////*/
+function createDropdown(id, label, items, selectItem, recipes) { 
     let dropdownWrapper = document.querySelector(`#${id}`);  // Sélectionne le conteneur du menu déroulant par son ID
     
     // Si le conteneur n'existe pas, on le crée
@@ -195,6 +81,7 @@ function removeRemoveIcon(itemElement) {
                     const filterType = id === 'dropdownIngredients' ? 'ingredient':
                                        id === 'dropdownAppliances' ? 'appliance': 
                                        id === 'dropdownUstensils' ? 'ustensil':
+                                       
 
                     selectItem(filterType, focusedItem.textContent, recipes);  // Sélectionne l'élément avec la fonction selectItem
                     toggleDropdownIcon(button, true);  // Ferme le menu après la sélection
@@ -213,24 +100,127 @@ function removeRemoveIcon(itemElement) {
             // Vérifie si l'élément cliqué est un item
             if (event.target.classList.contains('item')) {
                 // Détermine le type de filtre en fonction de l'ID du menu déroulant
-                const filterType = id === 'dropdownIngredients' ? 'ingredient':
+                const filterType = id === 'dropdownIngredients' ? 'ingredient': 
                                    id === 'dropdownAppliances' ? 'appliance': 
                                    id === 'dropdownUstensils' ? 'ustensil':
-
+                                  
                 selectItem(filterType, event.target.textContent, recipes);  // Passe l'élément sélectionné à la fonction selectItem
                 toggleDropdownIcon(button, true);  // Ferme le menu après la sélection
             }
         });
 
         // Passe le type d'élément (filterType) à la fonction createSearchArea
-        const filterType = id === 'dropdownIngredients' ? 'ingredient' :
-                           id === 'dropdownAppliances' ? 'appliance' : 'ustensil';
+        const filterType = id === 'dropdowns' ? 'ingredient' : 'appliance' || 'ustensil';
                         
         createSearchArea(listContainer, items, selectItem, filterType);  // Crée la zone de recherche dans le menu déroulant avec le type approprié
     }
 }
 
+/* //////////////////////////////////////////////////////////////////////////
+   OBJET POUR STOCKER LES ÉLÉMENTS FILTRÉS APRÈS LA PREMIÈRE RECHERCHE
+////////////////////////////////////////////////////////////////////////// */
+let firstFilteredItems = {
+    ingredients: [], // Stocke la liste des ingrédients filtrés
+    appliances: [], // idem pour les appareils
+    ustensils: []   // // idem pour les ustensiles
+}
 
+/* ///////////////////////////////////////////
+        REMPLISSAGE DE CREATEDROPDOWN
+////////////////////////////////////////// */
+// Fonction qui crée les boutons pour les listes déroulantes des filtres (ingrédients, appareils, ustensiles)
+export function createFiltersButtons(recipes) {  
+    const mainSearchResults = getMainSearchResults();  // Récupère les résultats de la recherche principale
+    
+    // Crée les menus déroulants pour chaque type de filtre (ingrédients, appareils, ustensiles)
+    // flatMap est utilisé pour aplatir les tableaux imbriqués afin d'obtenir une seule liste d'éléments
+    // selectItem est exécutée lorsqu'un utilisateur sélectionne un item dans la liste => mise en évidence en jaune avec croix
+    createDropdown('dropdownIngredients', 'Ingrédients', recipes.flatMap(recipe => recipe.ingredients.map(ing => ing.ingredient)), (item) => selectItem('ingredient', item, recipes), mainSearchResults, recipes);
+    createDropdown('dropdownAppliances', 'Appareils', recipes.map(recipe => recipe.appliance), (item) => selectItem('appliance', item, recipes), mainSearchResults, recipes);
+    createDropdown('dropdownUstensils', 'Ustensiles', recipes.flatMap(recipe => recipe.ustensils), (item) => selectItem('ustensil', item, recipes), mainSearchResults, recipes);
+}
+
+
+/* ////////////////////////////////////////////////////////
+   MISE À JOUR DE LA LISTE DANS UN SEUL MENU DÉROULANT
+//////////////////////////////////////////////////////// */
+// Fonction qui met à jour les éléments dans le menu déroulant (dropdown)
+function updateDropdown(id, items, type, recipes) {
+    const dropdownList = document.querySelector(`#${id} .list-container`);  // Sélectionne la liste du menu déroulant par son ID
+    if (!dropdownList) return console.error(`#${id} .list-container non trouvé`);  // Affiche une erreur si la liste n'est pas trouvée
+
+    dropdownList.innerHTML = '';  // Réinitialise la liste déroulante
+
+    // Parcourt chaque élément à ajouter à la liste déroulante
+    items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'item';  // Définit la classe `item` pour chaque élément
+        itemElement.tabIndex = '0';  // Rend l'élément focusable
+        itemElement.textContent = item;  // Définit le contenu textuel de l'élément
+
+        // Si l'élément est déjà sélectionné, on ajoute la classe `choice-item`
+        if (isItemSelected(type, item)) {
+            itemElement.classList.add('choice-item');
+            addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
+        }
+
+        // Gère la logique de sélection/désélection des éléments au clic
+        itemElement.addEventListener('click', () => {
+            if (itemElement.classList.contains('choice-item')) {
+                deselectItem(type, item);  // Désélectionne l'élément
+                itemElement.classList.remove('choice-item');
+                removeRemoveIcon(itemElement);  // Supprime l'icône de suppression
+            } else {
+                selectItem(type, item, recipes);  // Sélectionne l'élément
+                itemElement.classList.add('choice-item');
+                addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
+            }
+            
+            updateSelectedItems();  // Met à jour visuellement les éléments sélectionnés
+            filterAndShowRecipes(recipes);  // Filtre et affiche les recettes en fonction des sélections
+        });
+
+        dropdownList.appendChild(itemElement);  // Ajoute l'élément à la liste déroulante
+    });
+}
+
+/* ////////////////////////////////////////////////////////////////////////////////////////////////
+   MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT CREATEDROPDOWN
+/////////////////////////////////////////////////////////////////////////////////////////////// */
+export function updateDropdownOptions(filteredRecipes) {
+    const ingredients = new Set();  // Un Set est une structure de données qui garantit que chaque élément est unique. Cela permet d'éviter les doublons dans les listes de filtres
+    const appliances = new Set();  // idem
+    const ustensils = new Set();  // idem
+
+    // Remplit les Sets avec les ingrédients, appareils et ustensiles filtrés
+    filteredRecipes.forEach(recipe => {
+        recipe.ingredients.forEach(ing => ingredients.add(ing.ingredient.toLowerCase()));
+        appliances.add(recipe.appliance.toLowerCase());
+        recipe.ustensils.forEach(ust => ustensils.add(ust.toLowerCase()));
+    });
+
+    // Array.from : Une fois que les Sets ont été remplis avec les ingrédients, appareils et ustensiles uniques, ils sont convertis en tableaux à l'aide de Array.from(). Cela est nécessaire car les menus déroulants attendent des listes d'éléments, pas des Sets
+    // Les tableaux sont ensuite stockés dans l'objet appelé firstFilteredItems déclaré vide au départ en haut du fichier
+    firstFilteredItems.ingredients = Array.from(ingredients);
+    firstFilteredItems.appliances = Array.from(appliances);
+    firstFilteredItems.ustensils = Array.from(ustensils);
+
+    // Met à jour les listes déroulantes avec les nouvelles options filtrées 
+    // (Id, Liste, Type, Carte recette)
+    updateDropdown('dropdownIngredients', firstFilteredItems.ingredients, 'ingredient', filteredRecipes);
+    updateDropdown('dropdownAppliances', firstFilteredItems.appliances, 'appliance', filteredRecipes);
+    updateDropdown('dropdownUstensils', firstFilteredItems.ustensils, 'ustensil', filteredRecipes);
+}
+
+/* //////////////////////////////////////////////////////
+   GÉNÉRATION D'ID UNIQUE POUR LES ZONES DE RECHERCHE
+////////////////////////////////////////////////////// */
+// Fonction qui génère un ID unique pour chaque barre de recherche
+let idCounter = 0;  // Compteur d'ID
+function generateUniqueId(prefix = '') {
+    idCounter += 1;  // Incrémente le compteur
+    return `${prefix}-${idCounter}`;  // Retourne search-1, search-2 ou search-3 pour un id unique par barre de recherche du menu déroulant
+}
 
 /* ///////////////////////////////////////////////////////////
    GESTION DE LA ZONE DE RECHERCHE DANS LE MENU DÉROULANT
@@ -326,9 +316,9 @@ function createSearchArea(listContainer, items, selectItem, filterType) {
     });
 }
 
-/* /////////////////////////////////////////////////
-   AFFICHAGE DES ÉLÉMENTS DANS LE MENU DÉROULANT
-///////////////////////////////////////////////// */
+/* //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   AFFICHAGE DES ÉLÉMENTS DANS LE MENU DÉROULANT EN FONCTION DE LA RECHERCHE FAITE DANS LA BARRE DE RECHERCHE DE CELUI-CI 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */
 // Fonction qui affiche les éléments dans la liste du menu déroulant
 function displayList(listContainer, items, selectItem, filterType) {
     listContainer.innerHTML = '';  // Vide le conteneur avant d'ajouter les nouveaux éléments
@@ -358,35 +348,7 @@ function displayList(listContainer, items, selectItem, filterType) {
 }
 
 
-/* ///////////////////////////////////////////////////////
-   CRÉATION D'UN ÉLÉMENT DOM AVEC ATTRIBUTS ET ENFANTS
-/////////////////////////////////////////////////////// */
-// Fonction qui crée un élément DOM avec ses attributs et enfants
-function createElement(type, attributes = {}, children = []) {
-    const element = document.createElement(type);  // Crée un élément du type donné
-    Object.keys(attributes).forEach(attr => element.setAttribute(attr, attributes[attr]));  // Applique les attributs
-    children.forEach(child => element.appendChild(child));  // Ajoute les enfants
-    return element;  // Retourne l'élément créé
-}
 
-/* //////////////////////////////////////////////////////
-   GÉNÉRATION D'ID UNIQUE POUR LES ZONES DE RECHERCHE
-////////////////////////////////////////////////////// */
-// Fonction qui génère un ID unique pour chaque barre de recherche
-let idCounter = 0;  // Compteur d'ID
-function generateUniqueId(prefix = '') {
-    idCounter += 1;  // Incrémente le compteur
-    return `${prefix}-${idCounter}`;  // Retourne l'ID unique
-}
 
-/* //////////////////////////////////////////
-   GESTION DE L'ICÔNE DU MENU DÉROULANT
-////////////////////////////////////////// */
-// Fonction qui gère l'icône de flèche dans le menu déroulant
-function toggleDropdownIcon(button, isExpanded) {
-    button.setAttribute('aria-expanded', !isExpanded);  // Inverse l'état du menu (ouvert/fermé)
-    const icon = button.querySelector('.dropdown-icon');
-    icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';  // Fait pivoter l'icône de flèche
-    const content = button.nextElementSibling;
-    content.style.display = isExpanded ? 'none' : 'block';  // Affiche ou cache le contenu du menu
-}
+
+
