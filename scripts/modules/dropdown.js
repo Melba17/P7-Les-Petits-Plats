@@ -163,7 +163,8 @@ function updateDropdown(id, items, type, recipes) {
 }
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////
-   MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT CREATEDROPDOWN
+        MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT 
+        UPDATEDROPDOWN LORSQUE L'UTILISATEUR UTILISE LES FILTRES OU RECOMMENCE SA RECHERCHE
 /////////////////////////////////////////////////////////////////////////////////////////////// */
 export function updateDropdownOptions(filteredRecipes) {
     const ingredients = new Set();  // Un Set est une structure de données qui garantit que chaque élément est unique. Cela permet d'éviter les doublons dans les listes de filtres
