@@ -54,13 +54,14 @@ export function handleSearchInput() {
                         // Vérifier le titre
                         const titleMatch = termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name);
 
+                        // Vérifier la description
+                        const descriptionMatch = termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description);
+
                         // Vérifier les ingrédients avec some()
                         const ingredientMatch = recipe.ingredients.some(ingredient => 
                             termPatternSingular.test(ingredient.ingredient) || termPatternPlural.test(ingredient.ingredient)
                         );
 
-                        // Vérifier la description
-                        const descriptionMatch = termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description);
 
                         // Si le terme est trouvé dans l'un de ces trois champs, retourner true
                         return titleMatch || ingredientMatch || descriptionMatch;
