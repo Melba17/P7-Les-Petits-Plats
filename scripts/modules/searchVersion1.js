@@ -44,11 +44,13 @@ export function handleSearchInput() {
             ////////////////////// VERSION N°1 DE TRI /////////////////////////////////////////////////
             const filteredRecipes = [];  // Tableau pour stocker les recettes filtrées
 
+            
             for (let i = 0; i < recipes.length; i++) {
                 let recipe = recipes[i];
                 let recipeMatches = true;  // Variable pour vérifier si la recette correspond à tous les termes
 
                 // Vérifier que tous les termes (singulier/pluriel) sont présents dans le titre, les ingrédients ou la description
+                // Boucle pour les chaînes de caractères name et description
                 for (let j = 0; j < terms.length; j++) {
                     let term = terms[j];
                     let { singular, plural } = getSingularAndPluralForms(term);  // Obtenir les deux formes du terme
@@ -62,18 +64,18 @@ export function handleSearchInput() {
                         termFound = true;
                     }
 
-                    // Vérifier les ingrédients de la recette
-                    for (let k = 0; k < recipe.ingredients.length; k++) {
-                        if (termPatternSingular.test(recipe.ingredients[k].ingredient) || termPatternPlural.test(recipe.ingredients[k].ingredient)) {
-                            termFound = true;
-                            break;
-                        }
-                    }
-
                     // Vérifier la description de la recette
                     if (termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description)) {
                         termFound = true;
                     }
+
+                        // Vérifier les ingrédients de la recette à l'aide d'une autre boucle car la liste des ingrédients se trouve dans un tableau
+                        for (let k = 0; k < recipe.ingredients.length; k++) {
+                            if (termPatternSingular.test(recipe.ingredients[k].ingredient) || termPatternPlural.test(recipe.ingredients[k].ingredient)) {
+                                termFound = true;
+                                break;
+                            }
+                        }
 
                     // Si un terme n'est pas trouvé, la recette ne correspond pas
                     if (!termFound) {

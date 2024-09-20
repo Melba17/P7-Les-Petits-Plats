@@ -77,7 +77,7 @@ function createDropdown(id, label, items, selectItem, recipes) {
                 // Détermine le type de filtre en fonction de l'ID du menu déroulant
                 const filterType = id === 'dropdownIngredients' ? 'ingredient': 
                                    id === 'dropdownAppliances' ? 'appliance': 
-                                   id === 'dropdownUstensils' ? 'ustensil':
+                                   id === 'dropdownUstensils' ? 'ustensil': 
                                    
                                   
                 selectItem(filterType, event.target.textContent, recipes);  // Passe l'élément sélectionné à la fonction selectItem
@@ -86,7 +86,9 @@ function createDropdown(id, label, items, selectItem, recipes) {
         }); 
 
         // Passe le type d'élément (filterType) à la fonction createSearchArea
-        const filterType = id === 'dropdowns' ? 'ingredient' : 'appliance' || 'ustensil';
+        const filterType = id === 'dropdownIngredients' ? 'ingredient': 
+                           id === 'dropdownAppliances' ? 'appliance': 
+                           id === 'dropdownUstensils' ? 'ustensil': null;
                         
         createSearchArea(listContainer, items, selectItem, filterType);  // Crée la zone de recherche dans le menu déroulant avec le type approprié
     }
@@ -117,9 +119,9 @@ export function createFiltersButtons(recipes) {
 }
 
 
-/* ////////////////////////////////////////////////////////
-   MISE À JOUR DE LA LISTE DANS UN SEUL MENU DÉROULANT
-//////////////////////////////////////////////////////// */
+/* //////////////////////////////////////////////////////////////////
+   MANIERE DONT UNE LISTE DE MENU DÉROULANT SE MET A JOUR
+////////////////////////////////////////////////////////////////// */
 // Fonction qui met à jour les éléments dans le menu déroulant (dropdown)
 function updateDropdown(id, items, type, recipes) {
     const dropdownList = document.querySelector(`#${id} .list-container`);  // Sélectionne la liste du menu déroulant par son ID
@@ -152,7 +154,7 @@ function updateDropdown(id, items, type, recipes) {
                 addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
             }
             
-            updateSelectedItems();  // Met à jour visuellement les éléments sélectionnés
+            updateSelectedItems();  // Met à jour visuellement les tags sélectionnés
             filterAndShowRecipes(recipes);  // Filtre et affiche les recettes en fonction des sélections
         });
 
@@ -161,7 +163,7 @@ function updateDropdown(id, items, type, recipes) {
 }
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////
-   MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT CREATEDROPDOWN
+   MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT UPDATEDROPDOWN
 /////////////////////////////////////////////////////////////////////////////////////////////// */
 export function updateDropdownOptions(filteredRecipes) {
     const ingredients = new Set();  // Un Set est une structure de données qui garantit que chaque élément est unique. Cela permet d'éviter les doublons dans les listes de filtres
