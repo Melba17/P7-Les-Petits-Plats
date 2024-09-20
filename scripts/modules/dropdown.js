@@ -70,31 +70,6 @@ function createDropdown(id, label, items, selectItem, recipes) {
             }
         });
 
-        // GESTION DES INTERACTIONS CLAVIER (TAB, SHIFT+TAB, ENTER, ESPACE, ESCAPE)
-        listContainer.addEventListener('keydown', (event) => {
-            // Gère la sélection de l'élément avec la touche Enter ou Espace
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();  // Empêche le comportement par défaut de la touche
-                const focusedItem = document.activeElement;  // Récupère l'élément actuellement sélectionné (focus)
-                if (focusedItem.classList.contains('item')) {
-                    // Détermine le type de filtre en fonction de l'ID du menu déroulant
-                    const filterType = id === 'dropdownIngredients' ? 'ingredient':
-                                       id === 'dropdownAppliances' ? 'appliance': 
-                                       id === 'dropdownUstensils' ? 'ustensil':
-                                       
-
-                    selectItem(filterType, focusedItem.textContent, recipes);  // Sélectionne l'élément avec la fonction selectItem
-                    toggleDropdownIcon(button, true);  // Ferme le menu après la sélection
-                }
-            }
-
-            // Gère la fermeture du menu avec la touche Escape
-            if (event.key === 'Escape') {
-                toggleDropdownIcon(button, true);  // Ferme le menu
-                button.focus();  // Ramène le focus sur le bouton du menu
-            }
-        });
-
         // GESTION DE LA SÉLECTION PAR CLIC
         listContainer.addEventListener('click', (event) => {
             // Vérifie si l'élément cliqué est un item
@@ -103,11 +78,12 @@ function createDropdown(id, label, items, selectItem, recipes) {
                 const filterType = id === 'dropdownIngredients' ? 'ingredient': 
                                    id === 'dropdownAppliances' ? 'appliance': 
                                    id === 'dropdownUstensils' ? 'ustensil':
+                                   
                                   
                 selectItem(filterType, event.target.textContent, recipes);  // Passe l'élément sélectionné à la fonction selectItem
                 toggleDropdownIcon(button, true);  // Ferme le menu après la sélection
             }
-        });
+        }); 
 
         // Passe le type d'élément (filterType) à la fonction createSearchArea
         const filterType = id === 'dropdowns' ? 'ingredient' : 'appliance' || 'ustensil';

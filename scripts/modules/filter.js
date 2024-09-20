@@ -43,7 +43,7 @@ export function isItemSelected(type, item) {
    MISE À JOUR DU DERNIER FILTRE SÉLECTIONNÉ
 ///////////////////////////////////////////// */
 function updateLastSelectedFilter(filter) {
-    lastSelectedFilter = filter;  // Met à jour la variable avec le dernier filtre sélectionné
+ lastSelectedFilter = filter;  // Met à jour la variable avec le dernier filtre sélectionné
 }
 
 /* //////////////////////////////////////////
@@ -79,7 +79,7 @@ export function selectItem(type, item, recipes) {
     const itemElement = document.querySelector(`.item[data-value="${item.toLowerCase()}"]`);  // Sélectionne l'élément dans le DOM
     if (itemElement) {
         itemElement.classList.add('choice-item');  // Ajoute la classe pour mettre en évidence l'élément sélectionné
-        addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
+        addRemoveIcon(itemElement, item);  // Ajoute l'icône de suppression
     }
 }
 
@@ -110,11 +110,18 @@ export function deselectItem(type, item) {
         if (selectedIngredients.length === 0 && selectedAppliances.length === 0 && selectedUstensils.length === 0) {
             updateDropdownOptions(getData());  // Remet les listes déroulantes à leur état initial avec toutes les recettes
             showRecipeCards(getData());  // Affiche toutes les recettes
-            updateRecipeCounter(1500);  // Met à jour le compteur
+            updateRecipeCounter();  // Met à jour le compteur
             resetChoiceItems();  // Réinitialise l'état visuel des éléments sélectionnés
         }
     }
 }
+
+
+function resetChoiceItems() {
+    const choiceItems = document.querySelectorAll('.choice-item');
+    choiceItems.forEach(item => item.classList.remove('choice-item'));  // Supprime la classe 'choice-item' de tous les éléments
+}
+
 
 /* //////////////////////////////////////////
         MISES A JOUR GLOBALES
@@ -233,8 +240,3 @@ export function updateSelectedItems() {
     ['ingredient', 'appliance', 'ustensil'].forEach(createSelectedItems);
 }
 
-
-function resetChoiceItems() {
-    const choiceItems = document.querySelectorAll('.choice-item');
-    choiceItems.forEach(item => item.classList.remove('choice-item'));  // Supprime la classe 'choice-item' de tous les éléments
-}

@@ -6,11 +6,11 @@ import { updateDropdownOptions } from './dropdown.js';
 import { setMainSearchResults } from './state.js';
 import { getData } from '../main.js';
 
-let typingTimer;  // Timer utilisé pour détecter quand l'utilisateur a fini de taper
-const typingInterval = 500;  // Intervalle en millisecondes avant d'exécuter la recherche
+let typingTimer;  // Timer (minuteur) utilisé pour détecter quand l'utilisateur a fini de taper
+const typingInterval = 500;  // Intervalle/délai en millisecondes avant d'exécuter la recherche ou message d'erreur
 
 /* ///////////////////////////////////////////////////////////////////////////////////////////////
-   VERSION N°2 AVEC FILTER() ET SOME() - GESTION DE L'INPUT DE LA BARRE DE RECHERCHE PRINCIPALE 
+   VERSION N°2 AVEC FILTER() - GESTION DE L'INPUT DE LA BARRE DE RECHERCHE PRINCIPALE 
 /////////////////////////////////////////////////////////////////////////////////////////////// */
 
 export function handleSearchInput() {
@@ -20,14 +20,14 @@ export function handleSearchInput() {
     const crossIcon = document.querySelector('.cross-icon');  // Sélectionne l'icône de la croix pour réinitialiser la recherche
 
     searchInput.addEventListener('input', function () {
-        clearTimeout(typingTimer);  // Annule le précédent timer dès que l'utilisateur commence à taper
-
-        typingTimer = setTimeout(() => {  // Lance un timer après que l'utilisateur a fini de taper
+        clearTimeout(typingTimer);  // Annule le précédent timer dès que l'utilisateur commence à taper. Le timer est annulé et réinitialisé à chaque nouvelle frappe
+        typingTimer = setTimeout(() => {  // setTimeout permet d'exécuter une autre fonction après un certain délai (Minuteur calé à 500ms = typingInterval, après que l'utilisateur a fini de taper). En bref, il est utilisé pour différer l'exécution d'une fonction.
             const query = searchInput.value.toLowerCase().trim();  // Récupère la valeur de la barre de recherche et la nettoie
 
             const errorContainer = document.querySelector('.error-container');  // Sélectionne le conteneur pour afficher les messages d'erreur
+            // Si le conteneur existe déjà...
             if (errorContainer) {
-                errorContainer.innerHTML = '';  // Efface le message d'erreur avant d'exécuter une nouvelle recherche
+                errorContainer.innerHTML = '';  // ...efface le message d'erreur avant d'exécuter une nouvelle recherche
             }
 
             if (query.length < 3) {  // Si la requête contient moins de 3 caractères, on réinitialise
@@ -44,27 +44,27 @@ export function handleSearchInput() {
             /////////////////// VERSION N°2 DE TRI ///////////////////////////////
             // Filtrer les recettes en utilisant filter() et some()
             const filteredRecipes = recipes.filter(recipe => {
-                return terms.every(term => {
-                    const { singular, plural } = getSingularAndPluralForms(term);
+                    return terms.every(term => {
+                        const { singular, plural } = getSingularAndPluralForms(term);
 
-                    // Tester si le terme (singulier/pluriel) est trouvé dans le titre, les ingrédients ou la description
-                    const termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');
-                    const termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');
+                        // Tester si le terme (singulier/pluriel) est trouvé dans le titre, les ingrédients ou la description /New RegExp() = on compare le modéle / selon un mot précis, c'est à dire entre \\b...\\b, ici le mot au singulier ou au pluriel => double \ pour échapper le \ et que \b soit bien interprété comme une limite de mot et non \ comme un caractère spécial / 'i' pour ne pas tenir compte de la casse (Maj ou min)
+                        const termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');
+                        const termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');
 
-                    // Vérifier le titre
-                    const titleMatch = termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name);
+                        // Vérifier le titre
+                        const titleMatch = termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name);
 
-                    // Vérifier les ingrédients avec some()
-                    const ingredientMatch = recipe.ingredients.some(ingredient => 
-                        termPatternSingular.test(ingredient.ingredient) || termPatternPlural.test(ingredient.ingredient)
-                    );
+                        // Vérifier les ingrédients avec some()
+                        const ingredientMatch = recipe.ingredients.some(ingredient => 
+                            termPatternSingular.test(ingredient.ingredient) || termPatternPlural.test(ingredient.ingredient)
+                        );
 
-                    // Vérifier la description
-                    const descriptionMatch = termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description);
+                        // Vérifier la description
+                        const descriptionMatch = termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description);
 
-                    // Si le terme est trouvé dans l'un de ces trois champs, retourner true
-                    return titleMatch || ingredientMatch || descriptionMatch;
-                });
+                        // Si le terme est trouvé dans l'un de ces trois champs, retourner true
+                        return titleMatch || ingredientMatch || descriptionMatch;
+                    });
             });
 
             // Affichage des recettes filtrées
@@ -85,26 +85,36 @@ export function handleSearchInput() {
 
     // Pour gérer la croix de la barre de recherche principale
     if (searchInput && crossIcon) {
+        crossIcon.setAttribute('tabindex', '0');  // Rendre la croix focusable avec Tab
+        
         searchInput.addEventListener('input', () => {
-        crossIcon.classList.toggle('visible', searchInput.value.length > 2);  // Affiche ou cache la croix selon la longueur du texte
+            crossIcon.classList.toggle('visible', searchInput.value.length > 2);  // Affiche ou cache la croix selon la longueur du texte
+        });
+
+        crossIcon.addEventListener('click', () => {
+            searchInput.value = '';  // Réinitialise la barre de recherche
+            crossIcon.classList.remove('visible');  // Cache la croix
+            setMainSearchResults(null);  // Réinitialise les résultats de recherche
+            updateRecipeCounter(1500);  // Réinitialise le compteur
+            showRecipeCards(recipes);  // Affiche toutes les recettes
+            updateDropdownOptions(recipes);  // Met à jour les options du menu déroulant
+            filterAndShowRecipes();  // Réinitialise les filtres
+
+            // Efface le message d'erreur en cas de réinitialisation
+            const errorContainer = document.querySelector('.error-container');
+            if (errorContainer) {
+                errorContainer.innerHTML = '';  // Vide le conteneur d'erreur
+            }
+        });
+
+        // Gestion des touches Entrée et Espace pour déclencher le "clic" sur la croix
+        crossIcon.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();  // Empêche le défilement de la page en appuyant sur Espace
+                crossIcon.click();  // Déclenche le clic sur la croix
+            }
         });
     }
-
-    crossIcon.addEventListener('click', () => {
-    searchInput.value = '';  // Réinitialise la barre de recherche
-    crossIcon.classList.remove('visible');  // Cache la croix
-    setMainSearchResults(null);  // Réinitialise les résultats de recherche
-    updateRecipeCounter(1500);  // Réinitialise le compteur
-    showRecipeCards(recipes);  // Affiche toutes les recettes
-    updateDropdownOptions(recipes);  // Met à jour les options du menu déroulant
-    filterAndShowRecipes();  // Réinitialise les filtres
-
-        // Efface le message d'erreur en cas de réinitialisation
-        const errorContainer = document.querySelector('.error-container');
-        if (errorContainer) {
-        errorContainer.innerHTML = '';  // Vide le conteneur d'erreur
-        }
-    });
 }
 
 
@@ -145,9 +155,9 @@ function extractSearchTerms(query) {
             currentTerm += char;  // Ajoute le caractère actuel au terme en cours
         }
     }
-
+    // Si il reste encore un terme dans la requête mais qu'il n'est pas suivi d'un espace, donc que c'est le dernier terme, on l'ajoute au tableau terms = multirecherche
     if (currentTerm) {
-        terms.push(currentTerm.trim());  // Ajoute le dernier terme s'il n'est pas suivi d'un espace
+        terms.push(currentTerm.trim());  
     }
 
     return terms;  // Retourne la liste des termes extraits

@@ -2,9 +2,9 @@
 
 import { TemplateCards } from '../pattern/templateCard.js';
 
-/* //////////////////////////////////////////
-   AFFICHAGE DES CARTES DE RECETTES
-////////////////////////////////////////// */
+/* /////////////////////////////////////////////////
+   AFFICHAGE DES CARTES DE RECETTES - VISUEL
+//////////////////////////////////////////////// */
 export function showRecipeCards(recipes) {
     const cardSection = document.querySelector(".grid");  // Sélectionne l'élément où les cartes de recettes seront affichées.
     if (cardSection) {
