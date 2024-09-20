@@ -6,8 +6,9 @@ import { updateDropdownOptions } from './dropdown.js';
 import { setMainSearchResults } from './state.js';
 import { getData } from '../main.js';
 
-let typingTimer;  // Timer utilisé pour détecter quand l'utilisateur a fini de taper
-const typingInterval = 500;  // Intervalle en millisecondes avant d'exécuter la recherche
+let typingTimer; // Timer (minuteur) utilisé pour détecter quand l'utilisateur a fini de taper
+const typingInterval = 500; // Intervalle/délai en millisecondes avant d'exécuter la recherche ou message d'erreur
+
 
 /* ///////////////////////////////////////////////////////////////////////////////////////
    VERSION N°1 AVEC BOUCLE FOR - GESTION DE L'INPUT DE LA BARRE DE RECHERCHE PRINCIPALE 
@@ -19,9 +20,9 @@ export function handleSearchInput() {
     const crossIcon = document.querySelector('.cross-icon');  // Sélectionne l'icône de la croix pour réinitialiser la recherche
 
     searchInput.addEventListener('input', function () {
-        clearTimeout(typingTimer);  // Annule le précédent timer dès que l'utilisateur commence à taper
-
-        typingTimer = setTimeout(() => {  // Lance un timer après que l'utilisateur a fini de taper
+        clearTimeout(typingTimer); // Annule le précédent timer dès que l'utilisateur commence à taper. Le timer est annulé et réinitialisé à chaque nouvelle frappe
+        typingTimer = setTimeout(() => { // setTimeout permet d'exécuter une fonction après un certain délai (Minuteur calé à 500ms = typingInterval, après que l'utilisateur a fini de taper). En bref, il est utilisé pour différer l'exécution d'une fonction.
+        
             const query = searchInput.value.toLowerCase().trim();  // Récupère la valeur de la barre de recherche et la nettoie
 
             const errorContainer = document.querySelector('.error-container');  // Sélectionne le conteneur pour afficher les messages d'erreur
@@ -51,8 +52,9 @@ export function handleSearchInput() {
                 for (let j = 0; j < terms.length; j++) {
                     let term = terms[j];
                     let { singular, plural } = getSingularAndPluralForms(term);  // Obtenir les deux formes du terme
-                    let termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');  // Expression régulière pour le singulier
-                    let termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');  // Expression régulière pour le pluriel
+                    // Tester si le terme (singulier/pluriel) est trouvé dans le titre, les ingrédients ou la description /New RegExp() = on compare le modéle / selon un mot précis, c'est à dire entre \\b...\\b, ici le mot au singulier ou au pluriel => double \ pour échapper le \ et que \b soit bien interprété comme une limite de mot et non \ comme un caractère spécial / 'i' pour ne pas tenir compte de la casse (Maj ou min)
+                    let termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');  
+                    let termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');  
                     let termFound = false;  // Indicateur pour vérifier si le terme est trouvé
 
                     // Vérifier le titre de la recette
@@ -145,28 +147,29 @@ function getSingularAndPluralForms(term) {
 }
 
 /* //////////////////////////////////////////
-   EXTRACTION DES TERMES DE RECHERCHE
+   EXTRACTION DES TERMES DE RECHERCHE
 ////////////////////////////////////////// */
 // Fonction qui extrait les termes individuels (mots ou groupes de mots) d'une chaîne de caractères
 function extractSearchTerms(query) {
-    const terms = [];  // Tableau qui va stocker les termes extraits
-    let currentTerm = '';  // Variable pour accumuler chaque terme
-
-    for (let i = 0; i < query.length; i++) {
-        const char = query[i];  // Récupère chaque caractère de la chaîne de recherche
-        if (char === ' ') {  // Si un espace est rencontré, cela marque la fin d'un terme
-            if (currentTerm) {
-                terms.push(currentTerm.trim());  // Ajoute le terme au tableau après l'avoir nettoyé
-                currentTerm = '';  // Réinitialise la variable pour le prochain terme
+    const terms = []; // Tableau qui va stocker les termes extraits
+    let currentTerm = ''; // Variable pour accumuler chaque terme
+    
+        for (let i = 0; i < query.length; i++) {
+            const char = query[i]; // Récupère chaque caractère de la chaîne de recherche
+            if (char === ' ') { // Si un espace est rencontré, cela marque la fin d'un terme
+                if (currentTerm) {
+                    terms.push(currentTerm.trim()); // Ajoute le terme au tableau après l'avoir nettoyé
+                    currentTerm = ''; // Réinitialise la variable pour le prochain terme
+                }
+            } else {
+                currentTerm += char; // Ajoute le caractère actuel au terme en cours
             }
-        } else {
-            currentTerm += char;  // Ajoute le caractère actuel au terme en cours
         }
+        // Si il reste encore un terme dans la requête mais qu'il n'est pas suivi d'un espace, donc que c'est le dernier terme, on l'ajoute au tableau terms = multirecherche
+        if (currentTerm) {
+            terms.push(currentTerm.trim()); 
+        }
+    
+        return terms; // Retourne la liste des termes extraits
     }
-
-    if (currentTerm) {
-        terms.push(currentTerm.trim());  // Ajoute le dernier terme s'il n'est pas suivi d'un espace
-    }
-
-    return terms;  // Retourne la liste des termes extraits
-}
+    

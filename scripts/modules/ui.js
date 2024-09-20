@@ -2,9 +2,9 @@
 
 import { TemplateCards } from '../pattern/templateCard.js';
 
-/* //////////////////////////////////////////
-   AFFICHAGE DES CARTES DE RECETTES
-////////////////////////////////////////// */
+/* /////////////////////////////////////////////////
+   AFFICHAGE DES CARTES DE RECETTES - VISUEL
+//////////////////////////////////////////////// */
 export function showRecipeCards(recipes) {
     const cardSection = document.querySelector(".grid");  // Sélectionne l'élément où les cartes de recettes seront affichées.
     if (cardSection) {
@@ -32,6 +32,18 @@ export function updateRecipeCounter(count) {
 }
 
 /* //////////////////////////////////////////
+   GESTION DE L'ICÔNE DU MENU DÉROULANT
+////////////////////////////////////////// */
+// Fonction qui gère l'icône de flèche dans le menu déroulant
+export function toggleDropdownIcon(button, isExpanded) {
+    button.setAttribute('aria-expanded', !isExpanded);  // Inverse l'état du menu (ouvert/fermé)
+    const icon = button.querySelector('.dropdown-icon');
+    icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';  // Fait pivoter l'icône de flèche
+    const content = button.nextElementSibling;
+    content.style.display = isExpanded ? 'none' : 'block';  // Affiche ou cache le contenu du menu
+}
+
+/* //////////////////////////////////////////
    FERMETURE DES MENUS DÉROULANTS
 ////////////////////////////////////////// */
 export function closeDropdown() {
@@ -48,6 +60,41 @@ export function closeDropdown() {
         }
     });
 }
+
+
+/* //////////////////////////////////////////////////////////////////
+   AJOUT D'UNE ICÔNE DE SUPPRESSION SUR UN ÉLÉMENT SÉLECTIONNÉ
+///////////////////////////////////////////////////////////////// */
+// Fonction pour ajouter une icône de suppression à un élément sélectionné
+export function addRemoveIcon(itemElement, type, item) {
+    const removeIcon = document.createElement('i');  // Crée un élément icône
+    removeIcon.className = 'fa-solid fa-circle-xmark remove-icon';  // Définit la classe de l'icône
+    removeIcon.setAttribute('aria-label', 'Supprimer la sélection');  // Ajoute une description ARIA pour l'accessibilité
+
+    // Gère l'événement de clic sur l'icône de suppression
+    removeIcon.addEventListener('click', e => {
+        e.stopPropagation();  // Empêche la propagation du clic vers d'autres éléments
+        deselectItem(type, item);  // Désélectionne l'élément
+        itemElement.classList.remove('choice-item');  // Retire la mise en évidence de l'élément sélectionné
+        removeRemoveIcon(itemElement);  // Supprime l'icône de suppression
+        updateSelectedItems();  // Met à jour visuellement les éléments sous les filtres
+        filterAndShowRecipes();  // Réapplique les filtres et affiche les recettes
+    });
+
+    itemElement.appendChild(removeIcon);  // Ajoute l'icône à l'élément
+}
+
+/* //////////////////////////////////////////
+   SUPPRESSION DE L'ICÔNE DE SUPPRESSION
+////////////////////////////////////////// */
+// Fonction pour supprimer l'icône de suppression d'un élément
+export function removeRemoveIcon(itemElement) {
+    const removeIcon = itemElement.querySelector('.remove-icon');  // Sélectionne l'icône de suppression
+    if (removeIcon) {
+        removeIcon.remove();  // Supprime l'icône si elle est présente
+    }
+}
+
 
 /* //////////////////////////////////////////
    AJUSTEMENT DE LA MARGE DE LA GRILLE
@@ -83,7 +130,7 @@ export function showError(container, query) {
     messageText.textContent = "Aucune recette ne contient ";  // Définit le texte principal du message d'erreur.
     errorMessage.appendChild(messageText);  // Ajoute le texte principal au message d'erreur.
 
-    const errorQuery = document.createElement('span');  // Crée un span pour l'élément causant l'erreur (ex. un ingrédient non trouvé).
+    const errorQuery = document.createElement('span');  // Crée un span pour l'élément causant l'erreur 
     errorQuery.className = 'error-item';  // Ajoute la classe `error-item` pour styliser cet élément.
     errorQuery.textContent = query;  // Définit le texte de l'élément en erreur (ce qui a été recherché).
     errorMessage.appendChild(errorQuery);  // Ajoute l'élément en erreur au message.
