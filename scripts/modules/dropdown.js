@@ -16,7 +16,6 @@ function createElement(type, attributes = {}, children = []) {
     return element;  // Retourne l'élément créé
 }
 
-
 /* ////////////////////////////////////////////////////////////
     FONCTION POUR CRÉER VISUELLEMENT UN MENU DÉROULANT
 //////////////////////////////////////////////////////////////*/
@@ -163,7 +162,8 @@ function updateDropdown(id, items, type, recipes) {
 }
 
 /* ////////////////////////////////////////////////////////////////////////////////////////////////
-   MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT UPDATEDROPDOWN
+        MISE À JOUR DE L'ENSEMBLE DES LISTES DEROULANTES SIMULTANEMENT EN UTILISANT 
+        UPDATEDROPDOWN LORSQUE L'UTILISATEUR UTILISE LES FILTRES OU RECOMMENCE SA RECHERCHE
 /////////////////////////////////////////////////////////////////////////////////////////////// */
 export function updateDropdownOptions(filteredRecipes) {
     const ingredients = new Set();  // Un Set est une structure de données qui garantit que chaque élément est unique. Cela permet d'éviter les doublons dans les listes de filtres
