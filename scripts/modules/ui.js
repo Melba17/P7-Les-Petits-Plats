@@ -1,6 +1,7 @@
 // ui.js : GESTION DE L'INTERFACE UTILISATEUR (AFFICHAGE DES RECETTES, MARGES, COMPTEUR, ETC.)
 
 import { TemplateCards } from '../pattern/templateCard.js';
+import { deselectItem, updateSelectedItems, filterAndShowRecipes } from './filter.js';
 
 /* /////////////////////////////////////////////////
    AFFICHAGE DES CARTES DE RECETTES - VISUEL
