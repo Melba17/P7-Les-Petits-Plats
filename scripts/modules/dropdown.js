@@ -86,7 +86,9 @@ function createDropdown(id, label, items, selectItem, recipes) {
         }); 
 
         // Passe le type d'élément (filterType) à la fonction createSearchArea
-        const filterType = id === 'dropdowns' ? 'ingredient' : 'appliance' || 'ustensil';
+        const filterType = id === 'dropdownIngredients' ? 'ingredient': 
+                                   id === 'dropdownAppliances' ? 'appliance': 
+                                   id === 'dropdownUstensils' ? 'ustensil': null;
                         
         createSearchArea(listContainer, items, selectItem, filterType);  // Crée la zone de recherche dans le menu déroulant avec le type approprié
     }
