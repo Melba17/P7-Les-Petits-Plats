@@ -52,11 +52,15 @@ export function closeDropdown() {
     dropdowns.forEach(selector => {
         const button = document.querySelector(selector);  // Sélectionne chaque bouton de menu déroulant.
         if (button) {
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';  // Vérifie si le menu est ouvert.
+            if (isExpanded) {
+                toggleDropdownIcon(button, true);  // Bascule la flèche vers l'état fermé.
+            }
             button.setAttribute("aria-expanded", "false");  // Change l'attribut pour marquer le menu comme fermé.
             button.classList.remove('show');  // Retire la classe `show` pour fermer le menu visuellement.
-            const content = document.querySelector(`${selector.replace('Button', '')} .dropdown-content`);  // Sélectionne le contenu du menu déroulant en remplaçant 'button' par 'dropdown-content' donc récupérer le menu déroulant...
+            const content = document.querySelector(`${selector.replace('Button', '')} .dropdown-content`);  // Sélectionne le contenu du menu déroulant...
             if (content) {
-                content.style.display = 'none';  // ...et le cacher 
+                content.style.display = 'none';  // ...et le cache.
             }
         }
     });
