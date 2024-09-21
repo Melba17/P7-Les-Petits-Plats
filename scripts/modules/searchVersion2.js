@@ -99,7 +99,7 @@ export function handleSearchInput() {
             updateRecipeCounter(1500);  // Réinitialise le compteur
             showRecipeCards(recipes);  // Affiche toutes les recettes
             updateDropdownOptions(recipes);  // Met à jour les options du menu déroulant
-            filterAndShowRecipes();  // Réinitialise les filtres
+            filterAndShowRecipes();  // Réinitialise les filtres en fonction d'une option laissée ou non
 
             // Efface le message d'erreur en cas de réinitialisation
             const errorContainer = document.querySelector('.error-container');
