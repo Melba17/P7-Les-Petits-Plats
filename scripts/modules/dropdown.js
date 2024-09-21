@@ -73,17 +73,28 @@ function createDropdown(id, label, items, selectItem, recipes) {
         // GESTION DE LA SÉLECTION PAR CLIC
         listContainer.addEventListener('click', (event) => {
             // Vérifie si l'élément cliqué est un item
-            if (event.target.classList.contains('item')) {
-                // Détermine le type de filtre en fonction de l'ID du menu déroulant
-                const filterType = id === 'dropdownIngredients' ? 'ingredient': 
-                                   id === 'dropdownAppliances' ? 'appliance': 
-                                   id === 'dropdownUstensils' ? 'ustensil':
-                                   
-                                  
-                selectItem(filterType, event.target.textContent, recipes);  // Passe l'élément sélectionné à la fonction selectItem
-                toggleDropdownIcon(button, true);  // Ferme le menu après la sélection
+            if (event.target.classList.contains('item')) {               
+                updateSelectedItems();
+                filterAndShowRecipes();
             }
         }); 
+
+        // GESTION DE LA NAVIGATION CLAVIER
+        listContainer.addEventListener('keydown', (event) => {
+            // Vérifie si l'élément actuellement focalisé est un item
+            if (event.target.classList.contains('item')) {
+                // Vérifie si la touche pressée est 'Enter' ou 'Space'
+                if (event.key === 'Enter' || event.key === ' ') {
+                    // Empêche le comportement par défaut (ex. : faire défiler la page pour la touche 'Space')
+                    event.preventDefault();
+                    // Simule un clic sur l'élément focalisé
+                    event.target.click();
+                    // Met à jour les items sélectionnés et filtre les recettes
+                    updateSelectedItems();
+                    filterAndShowRecipes();
+                }
+            }
+        });
 
         // Passe le type d'élément (filterType) à la fonction createSearchArea
         const filterType = id === 'dropdownIngredients' ? 'ingredient': 

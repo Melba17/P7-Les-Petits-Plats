@@ -222,6 +222,16 @@ function createSelectedItems(type) {
             filterAndShowRecipes();  // Réapplique les filtres
         });
 
+        // Ajoute la gestion des événements clavier pour désélectionner le tag
+        selectedItem.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {  // Vérifie si la touche pressée est Enter ou Espace
+                event.preventDefault();  // Empêche l'action par défaut
+                deselectItem(type, item);  // Supprime l'élément de la sélection
+                updateSelectedItems();  // Met à jour l'affichage des éléments sélectionnés
+                filterAndShowRecipes();  // Réapplique les filtres
+            }
+        });
+
         selectedItem.appendChild(textContainer);  // Ajoute le texte à l'élément sélectionné
         selectedItem.appendChild(closeIcon);  // Ajoute l'icône de fermeture
         document.querySelector('.options-container').appendChild(selectedItem);  // Ajoute l'élément sélectionné au conteneur
