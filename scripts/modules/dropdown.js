@@ -16,6 +16,7 @@ function createElement(type, attributes = {}, children = []) {
     return element;  // Retourne l'élément créé
 }
 
+
 /* ////////////////////////////////////////////////////////////
     FONCTION POUR CRÉER VISUELLEMENT UN MENU DÉROULANT
 //////////////////////////////////////////////////////////////*/
@@ -72,22 +73,33 @@ function createDropdown(id, label, items, selectItem, recipes) {
         // GESTION DE LA SÉLECTION PAR CLIC
         listContainer.addEventListener('click', (event) => {
             // Vérifie si l'élément cliqué est un item
-            if (event.target.classList.contains('item')) {
-                // Détermine le type de filtre en fonction de l'ID du menu déroulant
-                const filterType = id === 'dropdownIngredients' ? 'ingredient': 
-                                   id === 'dropdownAppliances' ? 'appliance': 
-                                   id === 'dropdownUstensils' ? 'ustensil': 
-                                   
-                                  
-                selectItem(filterType, event.target.textContent, recipes);  // Passe l'élément sélectionné à la fonction selectItem
-                toggleDropdownIcon(button, true);  // Ferme le menu après la sélection
+            if (event.target.classList.contains('item')) {               
+                updateSelectedItems();
+                filterAndShowRecipes();
             }
         }); 
 
+        // GESTION DE LA NAVIGATION CLAVIER
+        listContainer.addEventListener('keydown', (event) => {
+            // Vérifie si l'élément actuellement focalisé est un item
+            if (event.target.classList.contains('item')) {
+                // Vérifie si la touche pressée est 'Enter' ou 'Space'
+                if (event.key === 'Enter' || event.key === ' ') {
+                    // Empêche le comportement par défaut (ex. : faire défiler la page pour la touche 'Space')
+                    event.preventDefault();
+                    // Simule un clic sur l'élément focalisé
+                    event.target.click();
+                    // Met à jour les items sélectionnés et filtre les recettes
+                    updateSelectedItems();
+                    filterAndShowRecipes();
+                }
+            }
+        });
+
         // Passe le type d'élément (filterType) à la fonction createSearchArea
         const filterType = id === 'dropdownIngredients' ? 'ingredient': 
-                           id === 'dropdownAppliances' ? 'appliance': 
-                           id === 'dropdownUstensils' ? 'ustensil': null;
+                                   id === 'dropdownAppliances' ? 'appliance': 
+                                   id === 'dropdownUstensils' ? 'ustensil': null;
                         
         createSearchArea(listContainer, items, selectItem, filterType);  // Crée la zone de recherche dans le menu déroulant avec le type approprié
     }
@@ -118,9 +130,9 @@ export function createFiltersButtons(recipes) {
 }
 
 
-/* //////////////////////////////////////////////////////////////////
-   MANIERE DONT UNE LISTE DE MENU DÉROULANT SE MET A JOUR
-////////////////////////////////////////////////////////////////// */
+/* ////////////////////////////////////////////////////////
+   MISE À JOUR DE LA LISTE DANS UN SEUL MENU DÉROULANT
+//////////////////////////////////////////////////////// */
 // Fonction qui met à jour les éléments dans le menu déroulant (dropdown)
 function updateDropdown(id, items, type, recipes) {
     const dropdownList = document.querySelector(`#${id} .list-container`);  // Sélectionne la liste du menu déroulant par son ID
@@ -153,7 +165,7 @@ function updateDropdown(id, items, type, recipes) {
                 addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
             }
             
-            updateSelectedItems();  // Met à jour visuellement les tags sélectionnés
+            updateSelectedItems();  // Met à jour visuellement les éléments sélectionnés
             filterAndShowRecipes(recipes);  // Filtre et affiche les recettes en fonction des sélections
         });
 
