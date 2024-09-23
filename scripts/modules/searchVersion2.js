@@ -41,31 +41,23 @@ export function handleSearchInput() {
 
             const terms = extractSearchTerms(query);  // Extrait les différents termes de la requête
            
-            /////////////////// VERSION N°2 DE TRI ///////////////////////////////
-            // Filtrer les recettes en utilisant filter() 
+            /////////////////// VERSION N°2 DE TRI /////////////////////////////// 
+            // Filtrer les recettes en utilisant filter()
             const filteredRecipes = recipes.filter(recipe => {
-                    return terms.every(term => {
-                        const { singular, plural } = getSingularAndPluralForms(term);
+                return terms.every(term => {
+                    const { singular, plural } = getSingularAndPluralForms(term);
 
-                        // Tester si le terme (singulier/pluriel) est trouvé dans le titre, les ingrédients ou la description /New RegExp() = on compare le modéle / selon un mot précis, c'est à dire entre \\b...\\b, ici le mot au singulier ou au pluriel => double \ pour échapper le \ et que \b soit bien interprété comme une limite de mot et non \ comme un caractère spécial / 'i' pour ne pas tenir compte de la casse (Maj ou min)
-                        const termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');
-                        const termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');
-
-                        // Vérifier le titre
-                        const titleMatch = termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name);
-
-                        // Vérifier la description
-                        const descriptionMatch = termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description);
-
-                        // Vérifier les ingrédients avec some()
-                        const ingredientMatch = recipe.ingredients.some(ingredient => 
-                            termPatternSingular.test(ingredient.ingredient) || termPatternPlural.test(ingredient.ingredient)
-                        );
-
-
-                        // Si le terme est trouvé dans l'un de ces trois champs, retourner true
-                        return titleMatch || ingredientMatch || descriptionMatch;
-                    });
+                    // Correspondance à partir de 3 caractères, tout en cherchant le singulier et le pluriel
+                    const partialMatch = recipe.name.toLowerCase().includes(singular) ||
+                                         recipe.name.toLowerCase().includes(plural) ||
+                                         recipe.description.toLowerCase().includes(singular) ||
+                                         recipe.description.toLowerCase().includes(plural) ||
+                                         // ingredient = le nom de la variable de la fonction fléchée => qui accède à la valeur 'ingredient' de la propriété 'ingredient'
+                                         recipe.ingredients.some(ingredient => ingredient.ingredient.toLowerCase().includes(singular) ||
+                                            ingredient.ingredient.toLowerCase().includes(plural)
+                                         );
+                    return partialMatch;  
+                });
             });
 
             // Affichage des recettes filtrées
