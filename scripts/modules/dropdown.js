@@ -60,7 +60,7 @@ function createDropdown(id, label, items, selectItem) {
             const isExpanded = button.getAttribute('aria-expanded') === 'true';  // Vérifie si le menu est déjà ouvert
             toggleDropdownIcon(button, isExpanded);  // Gère l'icône du menu (rotation de l'icône de flèche)
 
-            // Si le menu est fermé, on donne le focus au premier élément de la liste
+            // Lorsque le menu s'ouvre, on donne le focus au premier élément de la liste
             if (!isExpanded) {
                 const firstItem = listContainer.querySelector('.item');  // Sélectionne le premier élément de la liste
                 if (firstItem) {
