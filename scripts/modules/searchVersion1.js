@@ -42,9 +42,9 @@ export function handleSearchInput() {
             const terms = extractSearchTerms(query);  // Extrait les différents termes de la requête
 
             ////////////////////// VERSION N°1 DE TRI /////////////////////////////////////////////////
+            // Filtrage des recettes avec la boucle for
             const filteredRecipes = [];  // Tableau pour stocker les recettes filtrées
 
-            
             for (let i = 0; i < recipes.length; i++) {
                 let recipe = recipes[i];
                 let recipeMatches = true;  // Variable pour vérifier si la recette correspond à tous les termes
