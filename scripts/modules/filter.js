@@ -102,8 +102,7 @@ export function deselectItem(type, item) {
             itemElement.classList.remove('choice-item');  // Retire la mise en évidence de l'élément
         }
 
-        // Met à jour l'affichage des tags sous les filtres et les recettes
-        updateSelectedItems();  // Met à jour l'affichage des éléments sélectionnés (tags)
+        updateSelectedItems();  // Met à jour l'affichage des tags sélectionnés 
         filterAndShowRecipes();  // Réapplique les filtres restants et affiche les recettes
 
         // Si tous les filtres sont désélectionnés, réinitialise tout
