@@ -50,41 +50,38 @@ export function handleSearchInput() {
                 let recipeMatches = true;  // Variable pour vérifier si la recette correspond à tous les termes
 
                 // Vérifier que tous les termes (singulier/pluriel) sont présents dans le titre, les ingrédients ou la description
-                // Boucle pour les chaînes de caractères name et description
                 for (let j = 0; j < terms.length; j++) {
                     let term = terms[j];
                     let { singular, plural } = getSingularAndPluralForms(term);  // Obtenir les deux formes du terme
-                    // Tester si le terme (singulier/pluriel) est trouvé dans le titre, les ingrédients ou la description /New RegExp() = on compare le modéle / selon un mot précis, c'est à dire entre \\b...\\b, ici le mot au singulier ou au pluriel => double \ pour échapper le \ et que \b soit bien interprété comme une limite de mot et non \ comme un caractère spécial / 'i' pour ne pas tenir compte de la casse (Maj ou min)
-                    let termPatternSingular = new RegExp(`\\b${singular}\\b`, 'i');  
-                    let termPatternPlural = new RegExp(`\\b${plural}\\b`, 'i');  
-                    let termFound = false;  // Indicateur pour vérifier si le terme est trouvé
+                    // Correspondance partielle à partir de 3 caractères dans le nom, la description ou les ingrédients
+                    let partialMatch = false;
 
-                    // Vérifier le titre de la recette
-                    if (termPatternSingular.test(recipe.name) || termPatternPlural.test(recipe.name)) {
-                        termFound = true;
+                    // Vérifier si le nom (title) de la recette contient le terme partiel ou entier au singulier ou au pluriel
+                    if (recipe.name.toLowerCase().includes(singular) || recipe.name.toLowerCase().includes(plural)) {
+                        partialMatch = true;
                     }
 
-                    // Vérifier la description de la recette
-                    if (termPatternSingular.test(recipe.description) || termPatternPlural.test(recipe.description)) {
-                        termFound = true;
+                    // Vérifier si la description de la recette contient le terme partiel ou entier au singulier ou au pluriel
+                    if (recipe.description.toLowerCase().includes(singular) || recipe.description.toLowerCase().includes(plural)) {
+                        partialMatch = true;
                     }
 
-                        // Vérifier les ingrédients de la recette à l'aide d'une autre boucle car la liste des ingrédients se trouve dans un tableau
-                        for (let k = 0; k < recipe.ingredients.length; k++) {
-                            if (termPatternSingular.test(recipe.ingredients[k].ingredient) || termPatternPlural.test(recipe.ingredients[k].ingredient)) {
-                                termFound = true;
-                                break;
-                            }
+                    // Vérifier les ingrédients de la recette avec une boucle sur le tableau des ingrédients
+                    for (let k = 0; k < recipe.ingredients.length; k++) {
+                        if (recipe.ingredients[k].ingredient.toLowerCase().includes(singular) || recipe.ingredients[k].ingredient.toLowerCase().includes(plural)) {
+                            partialMatch = true;
+                            break;  // On arrête la boucle si une correspondance est trouvée dans les ingrédients
                         }
+                    }
 
-                    // Si un terme n'est pas trouvé, la recette ne correspond pas
-                    if (!termFound) {
-                        recipeMatches = false;
+                    // Si le terme n'est trouvé nulle part...
+                    if (!partialMatch) {
+                        recipeMatches = false;  // ... la recette ne correspond pas, on peut donc sortir de la boucle
                         break;
                     }
                 }
 
-                // Ajouter la recette aux résultats filtrés si elle correspond
+                // Ajoute la recette aux résultats filtrés si elle correspond
                 if (recipeMatches) {
                     filteredRecipes.push(recipe);
                 }
