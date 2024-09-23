@@ -20,9 +20,8 @@ function createElement(type, attributes = {}, children = []) {
 /* ////////////////////////////////////////////////////////////
     FONCTION POUR CRÉER VISUELLEMENT UN MENU DÉROULANT
 //////////////////////////////////////////////////////////////*/
-function createDropdown(id, label, items, selectItem, recipes) { 
+function createDropdown(id, label, items, selectItem) { 
     let dropdownWrapper = document.querySelector(`#${id}`);  // Sélectionne le conteneur du menu déroulant par son ID
-    
     // Si le conteneur n'existe pas, on le crée
     if (!dropdownWrapper) {
         // Crée un élément `div` pour contenir le menu déroulant
