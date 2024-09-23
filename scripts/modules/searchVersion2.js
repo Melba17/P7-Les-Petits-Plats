@@ -42,7 +42,7 @@ export function handleSearchInput() {
             const terms = extractSearchTerms(query);  // Extrait les différents termes de la requête
            
             /////////////////// VERSION N°2 DE TRI ///////////////////////////////
-            // Filtrer les recettes en utilisant filter() et some()
+            // Filtrer les recettes en utilisant filter() 
             const filteredRecipes = recipes.filter(recipe => {
                     return terms.every(term => {
                         const { singular, plural } = getSingularAndPluralForms(term);
