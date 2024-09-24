@@ -11,7 +11,6 @@ let selectedIngredients = [];
 let selectedAppliances = [];
 let selectedUstensils = [];
 
-let lastSelectedFilter = null;  // Dernier filtre sélectionné
 let isGridMarginAdjusted = false;  // Indique si la marge de la grille a été ajustée
 
 /* /////////////////////////////////////////////
@@ -39,12 +38,6 @@ export function isItemSelected(type, item) {
     return selectedList.includes(item.toLowerCase());  // Retourne vrai si l'élément est sélectionné
 }
 
-/* //////////////////////////////////////////////
-   MISE À JOUR DU DERNIER FILTRE SÉLECTIONNÉ
-///////////////////////////////////////////// */
-function updateLastSelectedFilter(filter) {
- lastSelectedFilter = filter;  // Met à jour la variable avec le dernier filtre sélectionné
-}
 
 /* //////////////////////////////////////////
             SÉLECTION D'UN FILTRE
@@ -52,23 +45,22 @@ function updateLastSelectedFilter(filter) {
 // Fonction qui met en forme la liste contenue dans le filtre sélectionné
 function selectFilter(type, item, recipes) {
     const selectedList = getSelectedList(type);  // Récupère la liste des éléments sélectionnés pour le type donné
-    const lowerItem = item?.toLowerCase();  // Convertit l'élément en minuscule / ? vérifie si item n'est pas null ou undefined avant de lancer la méthode toLowerCase()
-    const index = selectedList.indexOf(lowerItem);  // Cherche l'index de l'élément dans la liste grâce à indexOf
+    const lowerItem = item?.toLowerCase();  // Convertit l'élément en minuscule
+    const index = selectedList.indexOf(lowerItem);  // Cherche l'index de l'élément dans la liste
 
     // Si l'élément n'est pas trouvé (-1)...
     if (index === -1) {
-        selectedList.push(lowerItem);  // ...Ajoute l'élément 
-        updateLastSelectedFilter(item);  // Met à jour le dernier filtre sélectionné
+        selectedList.push(lowerItem);  // Ajoute l'élément
     } else {
-        selectedList.splice(index, 1);  // Supprime (splice) l'élément s'il est déjà sélectionné à l'index en question
-        updateLastSelectedFilter(selectedList.length > 0 ? selectedList[selectedList.length - 1] : null);  // Met à jour la liste du filtre sélectionné jusqu'à son dernier élément
+        selectedList.splice(index, 1);  // Supprime l'élément s'il est déjà sélectionné
     }
 
     filterAndShowRecipes(recipes);  // Filtre et affiche les recettes
-    updateSelectedItems();  // Met à jour les éléments visuels sous les filtres
+    updateSelectedItems();  // Met à jour les tags sous les filtres
     adjustGridMargin();  // Ajuste la marge de la grille
     closeDropdown();  // Ferme le menu déroulant
 }
+
 
 /* ///////////////////////////////////////////////////////
      SÉLECTION D'UN ÉLÉMENT DANS UNE LISTE DEROULANTE
@@ -209,7 +201,6 @@ function createSelectedItems(type) {
         selectedItem.tabIndex = '0';  // Rend l'élément focusable
 
         const textContainer = document.createElement('span');  // Crée un span pour le texte de l'élément
-        textContainer.className = 'option-text';  // Définit la classe du texte
         textContainer.textContent = item;  // Définit le contenu textuel de l'élément
 
         const closeIcon = document.createElement('i');  // Crée l'icône de fermeture
