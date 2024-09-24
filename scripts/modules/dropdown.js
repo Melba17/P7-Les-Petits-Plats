@@ -22,7 +22,6 @@ function createElement(type, attributes = {}, children = []) {
 //////////////////////////////////////////////////////////////*/
 function createDropdown(id, label, items, selectItem) { 
     let dropdownWrapper = document.querySelector(`#${id}`);  // Sélectionne le conteneur du menu déroulant par son ID
-    
     // Si le conteneur n'existe pas, on le crée
     if (!dropdownWrapper) {
         // Crée un élément `div` pour contenir le menu déroulant
@@ -165,7 +164,7 @@ function updateDropdown(id, items, type, recipes) {
                 addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
             }
             
-            updateSelectedItems();  // Met à jour visuellement les éléments sélectionnés
+            updateSelectedItems();  // Met à jour visuellement les tags sélectionnés
             filterAndShowRecipes(recipes);  // Filtre et affiche les recettes en fonction des sélections
         });
 
@@ -243,7 +242,7 @@ function createSearchArea(listContainer, items, selectItem, filterType) {
     });
 
     searchContainer.append(iconSearch, searchInput, clearIcon);  // Ajoute les icônes et le champ de recherche
-    listContainer.parentNode.insertBefore(searchContainer, listContainer);  // Place la zone de recherche au-dessus de la liste
+    listContainer.parentNode.insertBefore(searchContainer, listContainer);  // Place la zone de recherche au-dessus de la liste en début de conteneur
 
     const listItems = [...new Set(items.map(item => item.toLowerCase()))];  // Récupère la liste d'éléments filtrés de manière unique
     displayList(listContainer, listItems, selectItem, filterType);  // Affiche les éléments dans la liste
