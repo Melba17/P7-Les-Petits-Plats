@@ -3,7 +3,7 @@
 import { recipes } from './data/recipes.js';  
 import { showRecipeCards, updateRecipeCounter } from './modules/ui.js';  
 import { createFiltersButtons } from './modules/dropdown.js';
-import { selectIngredient, selectAppliance, selectUstensil, filterAndShowRecipes } from './modules/filter.js';
+import { filterAndShowRecipes } from './modules/filter.js';
 import { handleSearchInput } from './modules/searchVersion2.js';
 
 /* //////////////////////////////////////////
