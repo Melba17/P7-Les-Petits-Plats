@@ -33,7 +33,7 @@ export function handleSearchInput() {
             if (query.length < 3) {  // Si la requête contient moins de 3 caractères, on réinitialise
                 setMainSearchResults(null);  // Réinitialise les résultats de recherche
                 showRecipeCards(recipes);  // Affiche toutes les recettes
-                updateRecipeCounter(1500);  // Réinitialise le compteur à 1500
+                updateRecipeCounter();  // Réinitialise le compteur à 1500
                 updateDropdownOptions(recipes);  // Met à jour les options du menu déroulant
                 filterAndShowRecipes();  // Réinitialise les filtres
                 return;
@@ -88,7 +88,7 @@ export function handleSearchInput() {
             searchInput.value = '';  // Réinitialise la barre de recherche
             crossIcon.classList.remove('visible');  // Cache la croix
             setMainSearchResults(null);  // Réinitialise les résultats de recherche
-            updateRecipeCounter(1500);  // Réinitialise le compteur
+            updateRecipeCounter();  // Réinitialise le compteur
             showRecipeCards(recipes);  // Affiche toutes les recettes
             updateDropdownOptions(recipes);  // Met à jour les options du menu déroulant
             filterAndShowRecipes();  // Réinitialise les filtres en fonction d'une option laissée ou non

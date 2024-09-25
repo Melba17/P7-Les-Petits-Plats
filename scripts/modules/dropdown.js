@@ -129,9 +129,9 @@ export function createFiltersButtons(recipes) {
 }
 
 
-/* ////////////////////////////////////////////////////////
-   MISE À JOUR DE LA LISTE DANS UN SEUL MENU DÉROULANT
-//////////////////////////////////////////////////////// */
+/* ////////////////////////////////////////////////////////////
+   COMPORTEMENT POUR LA MISE A JOUR D'UN SEUL MENU DÉROULANT
+/////////////////////////////////////////////////////////// */
 // Fonction qui met à jour les éléments dans le menu déroulant (dropdown)
 function updateDropdown(id, items, type, recipes) {
     const dropdownList = document.querySelector(`#${id} .list-container`);  // Sélectionne la liste du menu déroulant par son ID
@@ -159,7 +159,7 @@ function updateDropdown(id, items, type, recipes) {
                 itemElement.classList.remove('choice-item');
                 removeRemoveIcon(itemElement);  // Supprime l'icône de suppression
             } else {
-                selectItem(type, item, recipes);  // Sélectionne l'élément
+                selectItem(type, item, recipes);  // Sélectionne ou resélectionne l'élément
                 itemElement.classList.add('choice-item');
                 addRemoveIcon(itemElement, type, item);  // Ajoute l'icône de suppression
             }
@@ -195,7 +195,7 @@ export function updateDropdownOptions(filteredRecipes) {
     firstFilteredItems.ustensils = Array.from(ustensils);
 
     // Met à jour les listes déroulantes avec les nouvelles options filtrées 
-    // (Id, Liste, Type, Carte recette)
+    // (Id, Liste, Type, Cartes recettes)
     updateDropdown('dropdownIngredients', firstFilteredItems.ingredients, 'ingredient', filteredRecipes);
     updateDropdown('dropdownAppliances', firstFilteredItems.appliances, 'appliance', filteredRecipes);
     updateDropdown('dropdownUstensils', firstFilteredItems.ustensils, 'ustensil', filteredRecipes);
@@ -317,7 +317,7 @@ function displayList(listContainer, items, selectItem, filterType) {
         items.forEach(item => {
             const itemElement = createElement('div', { class: 'item', tabindex: '0' }, [document.createTextNode(item)]);  // Crée un élément pour chaque item
 
-            // Si l'élément est déjà sélectionné, on ajoute la classe `choice-item`
+            // Si l'élément est sélectionné, on ajoute la classe `choice-item`
             if (isItemSelected(filterType, item)) {
                 itemElement.classList.add('choice-item');
                 addRemoveIcon(itemElement, filterType, item);  // Ajoute l'icône de suppression
