@@ -33,16 +33,17 @@ function getSelectedList(type) {
 /* /////////////////////////////////////////////
    VÉRIFICATION SI UN ÉLÉMENT EST SÉLECTIONNÉ
 /////////////////////////////////////////////*/
+// Adapte la logique "ajouter" ou "retirer" l'élément de la sélection / signale que l'item est sléctionné ou non
 export function isItemSelected(type, item) {
     const selectedList = getSelectedList(type);  // Récupère la liste des éléments sélectionnés pour le type donné
-    return selectedList.includes(item.toLowerCase());  // Retourne vrai si l'élément est sélectionné
+    return selectedList.includes(item.toLowerCase());  // Retourne vrai si l'élément est déjà sélectionné
 }
 
 
 /* //////////////////////////////////////////
             SÉLECTION D'UN FILTRE
 ////////////////////////////////////////// */
-// Fonction qui met en forme la liste contenue dans le filtre sélectionné
+// Fonction qui met en forme la liste contenue dans le filtre sélectionné en supprimant les doublons
 function selectFilter(type, item, recipes) {
     const selectedList = getSelectedList(type);  // Récupère la liste des éléments sélectionnés pour le type donné
     const lowerItem = item?.toLowerCase();  // Convertit l'élément en minuscule
@@ -107,7 +108,7 @@ export function deselectItem(type, item) {
     }
 }
 
-
+// Sécurité supplémentaire. On s'assure que tout les items sont bien désélectionnés 
 function resetChoiceItems() {
     const choiceItems = document.querySelectorAll('.choice-item');
     choiceItems.forEach(item => item.classList.remove('choice-item'));  // Supprime la classe 'choice-item' de tous les éléments
@@ -117,7 +118,7 @@ function resetChoiceItems() {
 /* //////////////////////////////////////////
         MISES A JOUR GLOBALES
 ////////////////////////////////////////// */
-// Fonctions qui mettent à jour et affichent aussi bien les filtres que les cartes recettes
+// Fonctions qui mettent à jour et affichent aussi bien les filtres avec l'élément sélectionné et les cartes recettes
 // Raccourcis pour utiliser "selectFilter" dans chaque filtre ou simplification de son appel
 export function selectIngredient(ingredient, recipes) {
     selectFilter('ingredient', ingredient, recipes);  
@@ -141,6 +142,7 @@ export function filterAndShowRecipes(recipes) {
     // Vérifie que 'recipes' est bien défini avant de l'utiliser
     const data = mainSearchResults !== null ? mainSearchResults : (recipes || getData());
 
+    // Même principe de tri que la version N°2 avec filter() mais cette fois à partir de l'item sélectionné dans la liste déroulante 
     const filteredRecipes = data.filter(recipe =>
         selectedIngredients.every(ingredient =>
             recipe.ingredients.some(ing => ing.ingredient.toLowerCase() === ingredient.toLowerCase())
@@ -182,7 +184,7 @@ function createOptionsContainer() {
     optionsContainer.className = 'options-container';  // Définit la classe du conteneur
     const flexContainer = document.querySelector('.flex');  // Sélectionne l'élément flex (ligne des filtres)
     if (flexContainer) {
-        flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);  // Insère optionsContainer (tags) après flexContainer (boutons de filtres)
+        flexContainer.parentNode.insertBefore(optionsContainer, flexContainer.nextSibling);  // flexContainer.parentNode et l'endroit à partir duquel on veut insérer optionsContainer (conteneur tags). nextSibling (noeud frère) est la grid dans le DOM. Donc on veut insérer optionsContainer entre flexContainer et nextSibling / ou avant (insertBefore) nextSibling (grid).
     } else {
         console.error('.flex non trouvé pour créer le conteneur');  // Affiche une erreur si l'élément flex n'est pas trouvé
     }
