@@ -16,7 +16,6 @@ function createElement(type, attributes = {}, children = []) {
     return element;  // Retourne l'élément créé
 }
 
-
 /* ////////////////////////////////////////////////////////////
     FONCTION POUR CRÉER VISUELLEMENT UN MENU DÉROULANT
 //////////////////////////////////////////////////////////////*/
@@ -60,7 +59,7 @@ function createDropdown(id, label, items, selectItem) {
             const isExpanded = button.getAttribute('aria-expanded') === 'true';  // Vérifie si le menu est déjà ouvert
             toggleDropdownIcon(button, isExpanded);  // Gère l'icône du menu (rotation de l'icône de flèche)
 
-            // Lorsque le menu s'ouvre, on donne le focus au premier élément de la liste
+            // Lorsque le menu est fermé mais qu'il va s'ouvrir, on donne le focus au premier élément de la liste
             if (!isExpanded) {
                 const firstItem = listContainer.querySelector('.item');  // Sélectionne le premier élément de la liste
                 if (firstItem) {
@@ -97,8 +96,8 @@ function createDropdown(id, label, items, selectItem) {
 
         // Passe le type d'élément (filterType) à la fonction createSearchArea
         const filterType = id === 'dropdownIngredients' ? 'ingredient': 
-                                   id === 'dropdownAppliances' ? 'appliance': 
-                                   id === 'dropdownUstensils' ? 'ustensil': null;
+                           id === 'dropdownAppliances' ? 'appliance': 
+                           id === 'dropdownUstensils' ? 'ustensil': null;
                         
         createSearchArea(listContainer, items, selectItem, filterType);  // Crée la zone de recherche dans le menu déroulant avec le type approprié
     }
