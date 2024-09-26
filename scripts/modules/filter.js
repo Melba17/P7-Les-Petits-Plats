@@ -39,7 +39,6 @@ export function isItemSelected(type, item) {
     return selectedList.includes(item.toLowerCase());  // Retourne vrai si l'élément est déjà sélectionné
 }
 
-
 /* //////////////////////////////////////////
             SÉLECTION D'UN FILTRE
 ////////////////////////////////////////// */
@@ -112,24 +111,6 @@ export function deselectItem(type, item) {
 function resetChoiceItems() {
     const choiceItems = document.querySelectorAll('.choice-item');
     choiceItems.forEach(item => item.classList.remove('choice-item'));  // Supprime la classe 'choice-item' de tous les éléments
-}
-
-
-/* //////////////////////////////////////////
-        MISES A JOUR GLOBALES
-////////////////////////////////////////// */
-// Fonctions qui mettent à jour et affichent aussi bien les filtres avec l'élément sélectionné et les cartes recettes
-// Raccourcis pour utiliser "selectFilter" dans chaque filtre ou simplification de son appel
-export function selectIngredient(ingredient, recipes) {
-    selectFilter('ingredient', ingredient, recipes);  
-}
-
-export function selectAppliance(appliance, recipes) {
-    selectFilter('appliance', appliance, recipes);  
-}
-
-export function selectUstensil(ustensil, recipes) {
-    selectFilter('ustensil', ustensil, recipes);  
 }
 
 /* //////////////////////////////////////////
