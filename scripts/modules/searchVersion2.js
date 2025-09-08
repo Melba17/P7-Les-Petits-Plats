@@ -45,12 +45,8 @@ export function handleSearchInput() {
             const terms = extractSearchTerms(query);  // Extrait les différents termes de la requête
 
             ////////////////////// VERSION N°2 DE TRI /////////////////////////////////////////////////
-            // Objectif : garder uniquement les recettes qui "matchent" TOUS les termes saisis.
-            // Outils :
-            // - recipes.filter(...)    => sélectionne les éléments qui vérifient un prédicat
-            // - terms.every(...)       => impose que CHAQUE terme corresponde quelque part dans la recette
-            // - array.some(...)        => vérifie qu'AU MOINS un élément du tableau correspond (ici, un ingrédient)
-            //
+            // Objectif : garder uniquement les recettes qui "matchent" avec le(s) termes saisis.
+            // 
             // Détail de la correspondance pour un terme :
             // - On génère ses variantes singulier/pluriel (ex : "tomate" ↔ "tomates").
             // - On cherche une correspondance PARTIELLE (includes) à partir de 3 caractères dans :
@@ -58,7 +54,7 @@ export function handleSearchInput() {
             //     • la description (recipe.description)
             //     • OU au moins un ingrédient (recipe.ingredients[].ingredient)
             const filteredRecipes = recipes.filter((recipe) => {
-                // Normalisation défensive : on évite les erreurs si certaines propriétés sont manquantes
+                // Normalisation 
                 const name = (recipe?.name || '').toLowerCase();
                 const description = (recipe?.description || '').toLowerCase();
                 const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
